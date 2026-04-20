@@ -1,3 +1,5 @@
+AIzaSyCFYqVs-YeztrZFUqhzMld-S0cFvwE-_7A
+
 from google import genai
 
 client = genai.Client(api_key="AIzaSyA3okEZcdyqm60xFDxiQtsI5-xfY7HCgOQ")
