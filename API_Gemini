@@ -1,1 +1,15 @@
+from google import genai
+
+client = genai.Client(api_key="AIzaSyA3okEZcdyqm60xFDxiQtsI5-xfY7HCgOQ")
+
+resp = client.models.generate_content(
+    model="gemini-1.5-flash",
+    contents="Say hello in one sentence"
+)
+
+print(resp.text)
+
+
+
+
 API_Key : AIzaSyA3okEZcdyqm60xFDxiQtsI5-xfY7HCgOQ
