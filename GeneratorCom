@@ -1,0 +1,329 @@
+import pandas as pd
+import configparser
+import ast
+import json
+from dfcx_scrapi.core.sessions import Sessions
+from google.protobuf.json_format import MessageToDict
+
+
+# ─── Helpers ────────────────────────────────────────────────────────────────
+def get_config_string(config, section, option, default_value):
+    try:
+        return config.get(section, option)
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        return default_value
+
+
+def extract_member_id(params: dict) -> str:
+    if not isinstance(params, dict):
+        print("  [DEBUG] extract_member_id: params is not a dict, got:", type(params))
+        return ""
+
+    print("  [DEBUG] extract_member_id: searching in keys:", list(params.keys()))
+
+    for key in ("MemberID", "memberId", "memberid", "member_id", "MEMBERID"):
+        if key in params:
+            val = params[key]
+            print(f"  [DEBUG] ✅ Found MemberID under key='{key}', value='{val}'")
+            if isinstance(val, dict):
+                return str(val.get("original") or val.get("resolved") or "")
+            return str(val)
+
+    # Case-insensitive fallback
+    for key, val in params.items():
+        if key.lower().replace("_", "") == "memberid":
+            print(f"  [DEBUG] ✅ Found MemberID via fallback key='{key}', value='{val}'")
+            if isinstance(val, dict):
+                return str(val.get("original") or val.get("resolved") or "")
+            return str(val)
+
+    print("  [DEBUG] ❌ MemberID NOT found in params")
+    return ""
+
+
+def print_parameters_debug(row_index, utterance, params: dict):
+    print(f"\n{'='*70}")
+    print(f"ROW {row_index} | Utterance: {utterance}")
+    if params:
+        print("  PARAMETERS:")
+        for key, val in params.items():
+            marker = " ✅ <-- MemberID" if key.lower().replace("_", "") == "memberid" else ""
+            print(f"    {key:30s} : {val}{marker}")
+    else:
+        print("  ⚠️  No parameters returned for this row")
+    print("="*70)
+
+
+def safe_parse_parameters(raw_parameters, row_index):
+    """
+    Tries 4 different methods to extract parameters from protobuf Struct.
+    Prints which method succeeded.
+    """
+    print(f"\n  [DEBUG] Row {row_index} — raw parameters type : {type(raw_parameters)}")
+    print(f"  [DEBUG] Row {row_index} — raw parameters value: {raw_parameters}")
+
+    if not raw_parameters:
+        print(f"  [DEBUG] Row {row_index} — parameters is empty/None, skipping")
+        return {}
+
+    # ── Method 1: MessageToDict (most reliable for protobuf Struct) ──────
+    try:
+        result = MessageToDict(raw_parameters)
+        if result:
+            print(f"  [DEBUG] ✅ Method 1 (MessageToDict) succeeded: {result}")
+            return result
+        else:
+            print(f"  [DEBUG] ⚠️  Method 1 (MessageToDict) returned empty dict")
+    except Exception as e:
+        print(f"  [DEBUG] ❌ Method 1 (MessageToDict) failed: {e}")
+
+    # ── Method 2: Access .fields directly ────────────────────────────────
+    try:
+        result = {}
+        for k, v in raw_parameters.fields.items():
+            # Each v is a protobuf Value — extract the actual value
+            kind = v.WhichOneof("kind")
+            if kind == "string_value":
+                result[k] = v.string_value
+            elif kind == "number_value":
+                result[k] = v.number_value
+            elif kind == "bool_value":
+                result[k] = v.bool_value
+            elif kind == "struct_value":
+                result[k] = MessageToDict(v.struct_value)
+            elif kind == "list_value":
+                result[k] = [MessageToDict(i) for i in v.list_value.values]
+            else:
+                result[k] = None
+        if result:
+            print(f"  [DEBUG] ✅ Method 2 (.fields iteration) succeeded: {result}")
+            return result
+        else:
+            print(f"  [DEBUG] ⚠️  Method 2 (.fields) returned empty dict")
+    except Exception as e:
+        print(f"  [DEBUG] ❌ Method 2 (.fields iteration) failed: {e}")
+
+    # ── Method 3: Plain dict() conversion ────────────────────────────────
+    try:
+        result = dict(raw_parameters)
+        if result:
+            print(f"  [DEBUG] ✅ Method 3 (dict()) succeeded: {result}")
+            return result
+        else:
+            print(f"  [DEBUG] ⚠️  Method 3 (dict()) returned empty dict")
+    except Exception as e:
+        print(f"  [DEBUG] ❌ Method 3 (dict()) failed: {e}")
+
+    # ── Method 4: JSON serialize → deserialize ───────────────────────────
+    try:
+        result = json.loads(type(raw_parameters).to_json(raw_parameters))
+        if result:
+            print(f"  [DEBUG] ✅ Method 4 (JSON roundtrip) succeeded: {result}")
+            return result
+        else:
+            print(f"  [DEBUG] ⚠️  Method 4 (JSON roundtrip) returned empty dict")
+    except Exception as e:
+        print(f"  [DEBUG] ❌ Method 4 (JSON roundtrip) failed: {e}")
+
+    print(f"  [DEBUG] ❌ ALL methods failed — returning empty dict")
+    return {}
+
+
+# ─── Main ───────────────────────────────────────────────────────────────────
+def main():
+    print("\n[DEBUG] ── Starting Script ──────────────────────────────────────")
+
+    config = configparser.ConfigParser()
+    config.read("Manisha_config1.properties")
+
+    agent_id          = config.get("dialogflow", "agent_id")
+    excel_file        = config.get("input", "excel_file")
+    sheet_name_raw    = config.get("input", "sheet_name")
+
+    try:
+        sheet_name = int(sheet_name_raw)
+    except ValueError:
+        sheet_name = sheet_name_raw
+
+    flow_display_name = config.get("input", "flow_display_name")
+    page_display_name = config.get("input", "page_display_name")
+    utterances_col    = config.get("input", "Utterances")
+    intent_column     = config.get("input", "intent_column")
+    test_case_column  = get_config_string(config, "input", "test_case_column", "Test Case name")
+    result_file       = config.get("output", "result_file")
+
+    print(f"[DEBUG] agent_id        : {agent_id}")
+    print(f"[DEBUG] excel_file      : {excel_file}")
+    print(f"[DEBUG] sheet_name      : {sheet_name}")
+    print(f"[DEBUG] flow            : {flow_display_name}")
+    print(f"[DEBUG] page            : {page_display_name}")
+    print(f"[DEBUG] utterances_col  : {utterances_col}")
+    print(f"[DEBUG] intent_column   : {intent_column}")
+    print(f"[DEBUG] result_file     : {result_file}")
+
+    # ─── Initialize Sessions ──────────────────────────────────────────────
+    print("\n[DEBUG] Initializing Sessions...")
+    sessions = Sessions(agent_id=agent_id)
+    print("[DEBUG] Sessions initialized successfully")
+
+    # ─── Read Excel ───────────────────────────────────────────────────────
+    df = pd.read_excel(excel_file, sheet_name=sheet_name)
+    print(f"\n[DEBUG] Excel loaded — shape: {df.shape}")
+    print(f"[DEBUG] Columns: {df.columns.tolist()}")
+
+    for col in [utterances_col, intent_column, test_case_column]:
+        if col not in df.columns:
+            raise ValueError(f"[ERROR] Missing column '{col}' in Excel")
+        print(f"[DEBUG] ✅ Column found: '{col}'")
+
+    df = df.reset_index(drop=True)
+
+    rows = []
+    total = len(df)
+    print(f"\n[DEBUG] Total utterances to process: {total}")
+
+    for i, row in df.iterrows():
+        utterance       = str(row[utterances_col])
+        expected_intent = str(row[intent_column])
+        test_case_name  = str(row[test_case_column])
+
+        print(f"\n[DEBUG] ── Row {i+1}/{total} ─────────────────────────────────")
+        print(f"[DEBUG] Utterance      : {utterance}")
+        print(f"[DEBUG] Expected Intent: {expected_intent}")
+
+        session_id = sessions.build_session_id(agent_id=agent_id)
+        print(f"[DEBUG] Session ID     : {session_id}")
+
+        # ─── Call detect_intent ───────────────────────────────────────────
+        try:
+            query_result = sessions.detect_intent(
+                agent_id=agent_id,
+                session_id=session_id,
+                text=utterance,
+                language_code="en"
+            )
+            print(f"[DEBUG] detect_intent call successful")
+            print(f"[DEBUG] query_result type: {type(query_result)}")
+        except Exception as e:
+            print(f"[ERROR] detect_intent failed: {e}")
+            rows.append({
+                test_case_column:      test_case_name,
+                "utterance":           utterance,
+                "expected_intent":     expected_intent,
+                "detected_intent":     "ERROR",
+                "intent_match":        False,
+                "all_parameters":      "{}",
+                "extracted_member_id": "",
+            })
+            continue
+
+        # ─── Extract detected intent ──────────────────────────────────────
+        detected_intent = ""
+        if query_result.match and query_result.match.intent:
+            detected_intent = query_result.match.intent.display_name
+            print(f"[DEBUG] Detected Intent: {detected_intent}")
+        else:
+            print(f"[DEBUG] ⚠️  No intent matched")
+
+        # ─── Extract parameters safely ────────────────────────────────────
+        params_dict = safe_parse_parameters(query_result.parameters, i)
+
+        # ─── Debug print all parameters ───────────────────────────────────
+        print_parameters_debug(i, utterance, params_dict)
+
+        # ─── Extract MemberID ─────────────────────────────────────────────
+        member_id = extract_member_id(params_dict)
+        print(f"[DEBUG] Final extracted_member_id: '{member_id}'")
+
+        intent_match = expected_intent == detected_intent
+        print(f"[DEBUG] Intent match: {intent_match}")
+
+        rows.append({
+            test_case_column:      test_case_name,
+            "utterance":           utterance,
+            "expected_intent":     expected_intent,
+            "detected_intent":     detected_intent,
+            "intent_match":        intent_match,
+            "all_parameters":      json.dumps(params_dict),
+            "extracted_member_id": member_id,
+        })
+
+    # ─── Build Results ────────────────────────────────────────────────────
+    results = pd.DataFrame(rows)
+    print(f"\n[DEBUG] Results shape: {results.shape}")
+
+    found = results[results["extracted_member_id"] != ""]
+    print(f"\n🎯 MemberID extracted in {len(found)}/{len(results)} rows")
+    print(results[["utterance", "detected_intent", "intent_match", "extracted_member_id"]].to_string())
+
+    results.to_csv(result_file, index=False)
+    print(f"\n✅ Saved: {result_file} | Rows: {len(results)}")
+    print("[DEBUG] ── Script Complete ───────────────────────────────────────\n")
+
+
+if __name__ == "__main__":
+    main()                            venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main> python .\SummaryGenerationTwo.py^C      
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main> pyt^C                     
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main> ^C
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main> ^C
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main> ^C
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main> ^C
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main> ^C
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main> python .\Manisha_utterance_NLU_Testing_accent_gender4.py
+
+[DEBUG] ── Starting Script ──────────────────────────────────────
+[DEBUG] agent_id        : projects/uoamaeeo-cava-suv3-ob86-5xvn85/locations/us-central1/agents/f4ef5c78-afa6-4ff9-b5b0-844f34f376f4
+[DEBUG] excel_file      : InputExcelApril2026\GeneratorTestingV2.xlsx
+[DEBUG] sheet_name      : 0
+[DEBUG] flow            : Member Authentication
+[DEBUG] page            : Collect MemberId
+[DEBUG] utterances_col  : Raw STT Input (Faulty)
+[DEBUG] intent_column   : Expected Normalized Output
+[DEBUG] result_file     : output_generator7.csv
+
+[DEBUG] Initializing Sessions...
+2026-04-20 23:10:59 INFO     Found user creds, skipping global scopes...
+[DEBUG] Sessions initialized successfully
+
+[DEBUG] Excel loaded — shape: (1, 4)
+[DEBUG] Columns: ['#', 'Raw STT Input (Faulty)', 'Expected Normalized Output', 'Regex Branch']
+[DEBUG] ✅ Column found: 'Raw STT Input (Faulty)'
+[DEBUG] ✅ Column found: 'Expected Normalized Output'
+[DEBUG] ✅ Column found: 'Raw STT Input (Faulty)'
+
+[DEBUG] Total utterances to process: 1
+
+[DEBUG] ── Row 1/1 ─────────────────────────────────
+[DEBUG] Utterance      : USW zero one two three four five six seven eight nine
+[DEBUG] Expected Intent: USW012345678
+[DEBUG] Session ID     : projects/uoamaeeo-cava-suv3-ob86-5xvn85/locations/us-central1/agents/f4ef5c78-afa6-4ff9-b5b0-844f34f376f4/sessions/ae0cf565-5120-4a31-81a5-c2ea4f2fa839
+**1session
+Printing SessionID*&*:projects/uoamaeeo-cava-suv3-ob86-5xvn85/locations/us-central1/agents/f4ef5c78-afa6-4ff9-b5b0-844f34f376f4/sessions/ae0cf565-5120-4a31-81a5-c2ea4f2fa839
+**2
+**3
+**4
+[DEBUG] detect_intent call successful
+[DEBUG] query_result type: <class 'google.cloud.dialogflowcx_v3beta1.types.session.QueryResult'>
+[DEBUG] ⚠️  No intent matched
+
+  [DEBUG] Row 0 — raw parameters type : <class 'NoneType'>
+  [DEBUG] Row 0 — raw parameters value: None
+  [DEBUG] Row 0 — parameters is empty/None, skipping
+
+======================================================================
+ROW 0 | Utterance: USW zero one two three four five six seven eight nine
+  ⚠️  No parameters returned for this row
+======================================================================
+  [DEBUG] extract_member_id: searching in keys: []
+  [DEBUG] ❌ MemberID NOT found in params
+[DEBUG] Final extracted_member_id: ''
+[DEBUG] Intent match: False
+
+[DEBUG] Results shape: (1, 7)
+
+🎯 MemberID extracted in 0/1 rows
+                                               utterance detected_intent  intent_match extracted_member_id
+0  USW zero one two three four five six seven eight nine                         False                    
+
+✅ Saved: output_generator7.csv | Rows: 1
+[DEBUG] ── Script Complete ─────────────────────────
