@@ -1,0 +1,181 @@
+import pandas as pd
+import configparser
+import ast
+import json
+from dfcx_scrapi.core.conversation import DialogflowConversation
+
+
+# ─── Helpers ────────────────────────────────────────────────────────────────
+def get_config_string(config, section, option, default_value):
+    try:
+        return config.get(section, option)
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        return default_value
+
+
+def parse_params_maybe_dict(value):
+    """
+    Parse parameters returned by dfcx_scrapi.
+    Handles dict, JSON string, python-literal dict string.
+    """
+    if value is None:
+        return None
+
+    if isinstance(value, dict):
+        return value
+
+    if isinstance(value, str):
+        s = value.strip()
+        if not s:
+            return None
+
+        try:
+            parsed = json.loads(s)
+            if isinstance(parsed, dict):
+                return parsed
+        except Exception:
+            pass
+
+        try:
+            parsed = ast.literal_eval(s)
+            if isinstance(parsed, dict):
+                return parsed
+        except Exception:
+            pass
+
+    return None
+
+
+def debug_print_parameters(raw_params, row_index):
+    """
+    Prints raw and parsed parameters for debugging.
+    """
+    print("\n" + "=" * 80)
+    print(f"DEBUG ROW {row_index}")
+    print("- RAW parameters value:")
+    print(raw_params)
+
+    parsed = parse_params_maybe_dict(raw_params)
+    print("- PARSED parameters:")
+    print(parsed)
+
+    if isinstance(parsed, dict):
+        print("- PARAMETER KEYS & VALUES:")
+        for k, v in parsed.items():
+            print(f"    {k} : {v}")
+    else:
+        print("- Parsed value is NOT a dict")
+
+    print("=" * 80)
+
+
+def extract_member_id(params):
+    """
+    TEMPORARY extractor (DEBUG MODE).
+    Just prints what comes in.
+    """
+    parsed = parse_params_maybe_dict(params)
+    print("EXTRACTOR RECEIVED:", parsed)
+    return ""
+
+
+# ─── Main ───────────────────────────────────────────────────────────────────
+def main():
+    config = configparser.ConfigParser()
+    config.read("Manisha_config1.properties")
+
+    agent_id = config.get("dialogflow", "agent_id")
+
+    excel_file = config.get("input", "excel_file")
+    sheet_name_raw = config.get("input", "sheet_name")
+
+    try:
+        sheet_name = int(sheet_name_raw)
+    except ValueError:
+        sheet_name = sheet_name_raw
+
+    flow_display_name = config.get("input", "flow_display_name")
+    page_display_name = config.get("input", "page_display_name")
+
+    utterances_col = config.get("input", "Utterances")
+    intent_column = config.get("input", "intent_column")
+    test_case_column = get_config_string(
+        config, "input", "test_case_column", "Test Case name"
+    )
+
+    result_file = config.get("output", "result_file")
+
+    # Initialize dfcx_scrapi conversation
+    conversation = DialogflowConversation(agent_id=agent_id)
+
+    # Read Excel
+    df = pd.read_excel(excel_file, sheet_name=sheet_name)
+
+    for col in [utterances_col, intent_column, test_case_column]:
+        if col not in df.columns:
+            raise ValueError(f"Missing column '{col}' in Excel")
+
+    df = df.reset_index(drop=True)
+
+    # Build test set (flow + page routing)
+    test_set = pd.DataFrame({
+        "flow_display_name": [flow_display_name] * len(df),
+        "page_display_name": [page_display_name] * len(df),
+        "utterance": df[utterances_col],
+        "inject_parameters": "",
+        "end_user_metadata": ""
+    })
+
+    # ✅ dfcx_scrapi call (POSITIONAL arguments only)
+    results = conversation.run_intent_detection(
+        test_set,
+        10,     # concurrency
+        100     # timeout
+    ).reset_index(drop=True)
+
+    print("\nAVAILABLE RESULT COLUMNS:")
+    print(results.columns.tolist())
+
+    # Identify parameters column
+    params_col = (
+        "parameters_set" if "parameters_set" in results.columns
+        else "parameters" if "parameters" in results.columns
+        else None
+    )
+
+    if params_col:
+        print(f"\nUSING PARAMETERS COLUMN: {params_col}")
+
+        # 🔥 DEBUG first N rows
+        for i in range(min(5, len(results))):
+            debug_print_parameters(results[params_col].iloc[i], i)
+    else:
+        print("\n❌ NO PARAMETERS COLUMN FOUND")
+
+    # Intent validation
+    results["expected_intent"] = df[intent_column]
+
+    if "detected_intent" not in results.columns:
+        raise ValueError("detected_intent missing from CX results")
+
+    results["intent_match"] = (
+        results["expected_intent"].astype(str) ==
+        results["detected_intent"].astype(str)
+    )
+
+    # Populate extracted_entity (debug mode)
+    if params_col:
+        results["extracted_entity"] = results[params_col].apply(extract_member_id)
+    else:
+        results["extracted_entity"] = ""
+
+    # Add Test Case name
+    results[test_case_column] = df[test_case_column]
+
+    # Write output
+    results.to_csv(result_file, index=False)
+    print(f"\n✅ Saved: {result_file} | Rows: {len(results)}")
+
+
+if __name__ == "__main__":
+    main()
