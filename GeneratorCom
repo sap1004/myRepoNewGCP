@@ -1,7 +1,19 @@
+# REPLACE the parameters block with this
 if query_result.parameters:
-    # MapComposite can be converted directly to dict like this
-    params_dict = dict(query_result.parameters)
-    # Convert any nested values to plain python types
-    params_dict = {k: (dict(v) if hasattr(v, 'keys') else v) 
-                   for k, v in params_dict.items()}
-    print(f"[DEBUG] ✅ params_dict: {params_dict}")
+    params_dict = {}
+    for key, value in query_result.parameters.items():
+        print(f"  [DEBUG] key='{key}', value='{value}', type='{type(value)}'")
+        if hasattr(value, 'string_value'):
+            params_dict[key] = value.string_value
+        elif hasattr(value, 'number_value'):
+            params_dict[key] = value.number_value
+        elif hasattr(value, 'bool_value'):
+            params_dict[key] = value.bool_value
+        elif hasattr(value, 'struct_value'):
+            params_dict[key] = dict(value.struct_value)
+        elif hasattr(value, 'list_value'):
+            params_dict[key] = list(value.list_value)
+        else:
+            # Fallback — just convert to string so we can see the value
+            params_dict[key] = str(value)
+    print(f"  [DEBUG] ✅ params_dict: {params_dict}")
