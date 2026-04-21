@@ -1,11 +1,7 @@
-[DEBUG] Session ID: projects/uoamaeeo-cava-suv3-ob86-5xvn85/locations/us-central1/agents/f4ef5c78-afa6-4ff9-b5b0-844f34f376f4/sessions/ce2281c3-81d4-4513-81de-b24cfd46290e
-[DEBUG] raw parameters: <proto.marshal.collections.maps.MapComposite object at 0x00000221C6BCF890>
-[ERROR] detect_intent failed for row 0: 'MapComposite' object has no attribute 'DESCRIPTOR'
-
-======================================================================
-ROW 0 | Utterance: USW zero one two three four five six seven eight nine
-  ⚠️  No parameters returned
-======================================================================
-  [DEBUG] Searching keys: []
-  [DEBUG] ❌ MemberID NOT found
-[DEBUG] extracted_member_id: ''
+if query_result.parameters:
+    # MapComposite can be converted directly to dict like this
+    params_dict = dict(query_result.parameters)
+    # Convert any nested values to plain python types
+    params_dict = {k: (dict(v) if hasattr(v, 'keys') else v) 
+                   for k, v in params_dict.items()}
+    print(f"[DEBUG] ✅ params_dict: {params_dict}")
