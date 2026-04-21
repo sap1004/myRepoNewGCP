@@ -1,6 +1,327 @@
-31610433211	3.86E+11
-654M35116155	654M35116155
-SV4131647	SV4131647
-764M50305641	764M50305641
-USW653287101	USW653287101
-2.22E+11	2.22E+11
+import pandas as pd
+import configparser
+import json
+from google.cloud.dialogflowcx_v3beta1.services.sessions import SessionsClient
+from google.cloud.dialogflowcx_v3beta1.types import session as cx_session
+from google.api_core.client_options import ClientOptions
+from dfcx_scrapi.core.conversation import DialogflowConversation
+from dfcx_scrapi.core.sessions import Sessions
+from openpyxl.styles import numbers
+
+
+# ─── Helpers ────────────────────────────────────────────────────────────────
+def get_config_string(config, section, option, default_value):
+    try:
+        return config.get(section, option)
+    except (configparser.NoSectionError, configparser.NoOptionError):
+        return default_value
+
+
+def clean_value(value):
+    """
+    Converts any value to clean string.
+    Handles scientific notation like 3.86E+11 → 316104332181
+    Removes trailing .0 from floats.
+    """
+    if value is None:
+        return ""
+    s = str(value).strip()
+    if "E+" in s.upper():
+        try:
+            return str(int(float(s)))
+        except Exception:
+            pass
+    if s.endswith(".0"):
+        s = s[:-2]
+    return s
+
+
+def extract_member_id(params: dict) -> str:
+    """Extracts MemberID from parameters dict and strips ,VALID or any suffix."""
+    if not isinstance(params, dict):
+        print("  [DEBUG] extract_member_id: not a dict:", type(params))
+        return ""
+
+    print("  [DEBUG] Searching keys:", list(params.keys()))
+
+    for key in ("MemberID", "memberId", "memberid", "member_id", "MEMBERID"):
+        if key in params:
+            val = params[key]
+            print(f"  [DEBUG] ✅ Found key='{key}' value='{val}'")
+            if isinstance(val, dict):
+                raw = str(val.get("original") or val.get("resolved") or "")
+            else:
+                raw = str(val)
+            return clean_value(raw.split(",")[0].strip())
+
+    # Case-insensitive fallback
+    for key, val in params.items():
+        if key.lower().replace("_", "") == "memberid":
+            print(f"  [DEBUG] ✅ Fallback found key='{key}' value='{val}'")
+            if isinstance(val, dict):
+                raw = str(val.get("original") or val.get("resolved") or "")
+            else:
+                raw = str(val)
+            return clean_value(raw.split(",")[0].strip())
+
+    print("  [DEBUG] ❌ MemberID NOT found")
+    return ""
+
+
+def print_parameters_debug(row_index, utterance, params: dict):
+    print(f"\n{'='*70}")
+    print(f"ROW {row_index} | Utterance: {utterance}")
+    if params:
+        print("  PARAMETERS:")
+        for key, val in params.items():
+            marker = " ✅ <-- MemberID" if key.lower().replace("_", "") == "memberid" else ""
+            print(f"    {key:30s} : {val}{marker}")
+    else:
+        print("  ⚠️  No parameters returned")
+    print("="*70)
+
+
+def extract_params_from_map(parameters) -> dict:
+    """Safely converts MapComposite parameters to plain Python dict."""
+    params_dict = {}
+    for key, value in parameters.items():
+        print(f"  [DEBUG] key='{key}', value='{value}', type='{type(value)}'")
+        if hasattr(value, 'string_value'):
+            params_dict[key] = value.string_value
+        elif hasattr(value, 'number_value'):
+            params_dict[key] = value.number_value
+        elif hasattr(value, 'bool_value'):
+            params_dict[key] = value.bool_value
+        elif hasattr(value, 'struct_value'):
+            params_dict[key] = dict(value.struct_value)
+        elif hasattr(value, 'list_value'):
+            params_dict[key] = list(value.list_value)
+        else:
+            params_dict[key] = str(value)
+    return params_dict
+
+
+def save_to_excel(results: pd.DataFrame, result_file: str):
+    """
+    Saves results to Excel with all columns forced as TEXT format
+    so long numbers like 316104332181 are never converted to 3.86E+11.
+    """
+    writer = pd.ExcelWriter(result_file, engine='openpyxl')
+    results.to_excel(writer, index=False, sheet_name='Results')
+
+    workbook  = writer.book
+    worksheet = writer.sheets['Results']
+
+    # ✅ Force ALL cells to TEXT format so numbers stay as-is
+    for row in worksheet.iter_rows(min_row=2, max_row=worksheet.max_row):
+        for cell in row:
+            if cell.value is not None:
+                cell.number_format = '@'   # @ = TEXT in Excel
+                cell.value = str(cell.value)  # ensure stored as string
+
+    # Auto-fit column widths for readability
+    for col in worksheet.columns:
+        max_length = max(
+            len(str(cell.value)) if cell.value else 0
+            for cell in col
+        )
+        worksheet.column_dimensions[col[0].column_letter].width = max_length + 4
+
+    writer.close()
+    print(f"\n✅ Saved: {result_file} | Rows: {len(results)}")
+
+
+# ─── Main ───────────────────────────────────────────────────────────────────
+def main():
+    print("\n[DEBUG] ── Starting Script ──────────────────────────────────────")
+
+    config = configparser.ConfigParser()
+    config.read("Manisha_config1.properties")
+
+    agent_id          = config.get("dialogflow", "agent_id")
+    excel_file        = config.get("input", "excel_file")
+    sheet_name_raw    = config.get("input", "sheet_name")
+
+    try:
+        sheet_name = int(sheet_name_raw)
+    except ValueError:
+        sheet_name = sheet_name_raw
+
+    flow_display_name   = config.get("input", "flow_display_name")
+    page_display_name   = config.get("input", "page_display_name")
+    utterances_col      = config.get("input", "Utterances")
+    intent_column       = config.get("input", "intent_column")
+    test_case_column    = get_config_string(config, "input", "test_case_column", "Test Case name")
+    result_file         = config.get("output", "result_file")
+    expected_output_col = "Expected Normalized Output"
+
+    # ── Make sure result_file ends with .xlsx ──────────────────────────────
+    if not result_file.endswith(".xlsx"):
+        result_file = result_file.replace(".csv", ".xlsx")
+        if not result_file.endswith(".xlsx"):
+            result_file = result_file + ".xlsx"
+    print(f"[DEBUG] result_file : {result_file}")
+
+    # ── Extract location from agent_id ─────────────────────────────────────
+    location = agent_id.split("/locations/")[1].split("/")[0]
+    print(f"[DEBUG] agent_id : {agent_id}")
+    print(f"[DEBUG] location : {location}")
+    print(f"[DEBUG] flow     : {flow_display_name}")
+    print(f"[DEBUG] page     : {page_display_name}")
+
+    # ── Initialize DialogflowConversation for intent detection ─────────────
+    print("\n[DEBUG] Initializing DialogflowConversation...")
+    conversation = DialogflowConversation(agent_id=agent_id)
+    print("[DEBUG] DialogflowConversation initialized")
+
+    # ── Initialize dfcx_scrapi Sessions for session ID generation ──────────
+    print("[DEBUG] Initializing dfcx_scrapi Sessions...")
+    sessions = Sessions(agent_id=agent_id)
+    print("[DEBUG] Sessions initialized")
+
+    # ── Initialize raw Google CX client for detect_intent calls ───────────
+    print("[DEBUG] Initializing raw CX SessionsClient...")
+    client_options = ClientOptions(
+        api_endpoint=f"{location}-dialogflow.googleapis.com"
+    )
+    cx_client = SessionsClient(client_options=client_options)
+    print("[DEBUG] CX SessionsClient initialized")
+
+    # ── Read Excel — dtype=str prevents scientific notation ────────────────
+    print(f"\n[DEBUG] Reading Excel: {excel_file}, sheet: {sheet_name}")
+    df = pd.read_excel(excel_file, sheet_name=sheet_name, dtype=str)
+    print(f"[DEBUG] Excel loaded — shape: {df.shape}")
+    print(f"[DEBUG] Columns: {df.columns.tolist()}")
+
+    for col in [utterances_col, intent_column, test_case_column, expected_output_col]:
+        if col not in df.columns:
+            raise ValueError(f"[ERROR] Missing column '{col}' in Excel")
+        print(f"[DEBUG] ✅ Column found: '{col}'")
+
+    df = df.reset_index(drop=True)
+
+    # ── Run intent detection via dfcx_scrapi (handles flow+page routing) ───
+    test_set = pd.DataFrame({
+        "flow_display_name": [flow_display_name] * len(df),
+        "page_display_name": [page_display_name] * len(df),
+        "utterance":         df[utterances_col],
+        "inject_parameters": "",
+        "end_user_metadata": ""
+    })
+
+    print(f"\n[DEBUG] Running run_intent_detection for {len(df)} utterances...")
+    intent_results = conversation.run_intent_detection(
+        test_set, 10, 100
+    ).reset_index(drop=True)
+    print(f"[DEBUG] Intent result columns: {intent_results.columns.tolist()}")
+
+    # ── Loop: multi-turn conversation per row to extract parameters ─────────
+    rows = []
+    total = len(df)
+
+    for i, row in df.iterrows():
+        utterance       = clean_value(row[utterances_col])
+        expected_intent = clean_value(row[intent_column])
+        test_case_name  = clean_value(row[test_case_column])
+        expected_output = clean_value(row[expected_output_col])
+        detected_intent = str(intent_results["detected_intent"].iloc[i]) \
+            if "detected_intent" in intent_results.columns else ""
+
+        print(f"\n[DEBUG] ── Row {i+1}/{total} ─────────────────────────────────")
+        print(f"[DEBUG] Utterance             : {utterance}")
+        print(f"[DEBUG] Expected Intent       : {expected_intent}")
+        print(f"[DEBUG] Detected Intent       : {detected_intent}")
+        print(f"[DEBUG] Expected Norm. Output : {expected_output}")
+
+        params_dict = {}
+        try:
+            # ✅ Fresh session per row using dfcx_scrapi build_session_id
+            session_id = sessions.build_session_id(agent_id=agent_id)
+            print(f"[DEBUG] Session ID: {session_id}")
+
+            # ── Turn 1: Send "Hi" — navigates bot to correct page ─────────
+            print(f"[DEBUG] Turn 1: Sending 'Hi'...")
+            turn1_request = cx_session.DetectIntentRequest(
+                session=session_id,
+                query_input=cx_session.QueryInput(
+                    text=cx_session.TextInput(text="Hi"),
+                    language_code="en"
+                )
+            )
+            turn1_response = cx_client.detect_intent(request=turn1_request)
+            print(f"[DEBUG] Turn 1 page: {turn1_response.query_result.current_page.display_name}")
+
+            # ── Turn 2: Send actual utterance in SAME session ──────────────
+            print(f"[DEBUG] Turn 2: Sending utterance '{utterance}'...")
+            turn2_request = cx_session.DetectIntentRequest(
+                session=session_id,    # ✅ same session = same conversation
+                query_input=cx_session.QueryInput(
+                    text=cx_session.TextInput(text=utterance),
+                    language_code="en"
+                )
+            )
+            turn2_response = cx_client.detect_intent(request=turn2_request)
+            query_result   = turn2_response.query_result
+
+            print(f"[DEBUG] Turn 2 page    : {query_result.current_page.display_name}")
+            print(f"[DEBUG] raw parameters : {query_result.parameters}")
+
+            # ── Extract parameters ─────────────────────────────────────────
+            if query_result.parameters:
+                params_dict = extract_params_from_map(query_result.parameters)
+                print(f"[DEBUG] ✅ params_dict: {params_dict}")
+            else:
+                print("[DEBUG] ⚠️  parameters empty after Turn 2")
+
+        except Exception as e:
+            print(f"[ERROR] detect_intent failed for row {i}: {e}")
+
+        # ── Debug print all parameters ─────────────────────────────────────
+        print_parameters_debug(i, utterance, params_dict)
+
+        # ── Extract MemberID ───────────────────────────────────────────────
+        member_id    = extract_member_id(params_dict)
+        intent_match = expected_intent == detected_intent
+
+        # ✅ Comparison happens here in memory BEFORE writing to Excel
+        matching = member_id == expected_output
+
+        print(f"[DEBUG] extracted_member_id       : '{member_id}'")
+        print(f"[DEBUG] Expected Normalized Output : '{expected_output}'")
+        print(f"[DEBUG] Matching                   : {matching}")
+        print(f"[DEBUG] intent_match               : {intent_match}")
+
+        rows.append({
+            test_case_column:             test_case_name,
+            "utterance":                  utterance,
+            "expected_intent":            expected_intent,
+            "detected_intent":            detected_intent,
+            "intent_match":               intent_match,
+            "all_parameters":             json.dumps(params_dict),
+            "extracted_member_id":        member_id,
+            "Expected Normalized Output": expected_output,
+            "Matching":                   matching,
+        })
+
+    # ── Build Results ──────────────────────────────────────────────────────
+    results = pd.DataFrame(rows)
+    print(f"\n[DEBUG] Results shape: {results.shape}")
+
+    found = results[results["extracted_member_id"] != ""]
+    print(f"\n🎯 MemberID extracted in {len(found)}/{len(results)} rows")
+    print(results[[
+        "utterance",
+        "detected_intent",
+        "intent_match",
+        "extracted_member_id",
+        "Expected Normalized Output",
+        "Matching"
+    ]].to_string())
+
+    # ✅ Save to Excel with TEXT format — no scientific notation
+    save_to_excel(results, result_file)
+    print("[DEBUG] ── Script Complete ───────────────────────────────────────\n")
+
+
+if __name__ == "__main__":
+    main()
