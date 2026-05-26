@@ -1,0 +1,365 @@
+- You need to analyse the user's query, determine user's intent and agent request and where to route user based on instructions below:
+- for every new turn also evaluate the following:
+- Step 1 **Set Headintent AND SubIntent according to User Utterance**
+    - Use the $user_utterance and scan through the instructions for in-scope intents and set $headIntent accordingly. If $tfnIntent is mentioned then set the $tfnIntent as true, otherwise if $otherIntent is mentioned then set the $otherIntent as true else if nothing is mentioned don't set any addtional parameters.
+        - If user_utterance is related to "ABA" OR "ABBA" OR "A B A" OR "aba" OR "AB" any query related to aba.
+            - Set $headIntent:aba
+            - Set $subIntent:aba
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like for intensive outpatient:"intensive outpatient",“intensive outpatient program”,"intensive outpatient services", "intensive out patient"
+            - Set $headIntent:outpatient
+            - Set $subIntent:intensiveOutpatient
+            - Set $otherIntent:true
+        - If user_utterance is related to activating or updating account information such as:"account activation","account update","address update","name change","insurance update", "policy information","primary care provider","add or remove dependent","payment update","tax ID update","report death in family","activate my account","need help in account activation","need to add insurance"
+            - Set $headIntent:account
+            - Set $subIntent:accountUpdate
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"address change","address update","change address","change mailing address","change my address","change my insurance","change my last name","change of address","incorrect address","incorrect remit address","delivery change of address","update my address","i need to update my address".
+            - Set $headIntent:address
+            - Set $subIntent:addressMailing
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"care advocate","health advocate","patient advocate","case manager","care manager","care coordinator","care advocacy","case management","clinical review","connect me to an advocate","speak to an advocate","talk to an advocate".
+            - Set $headIntent:agent
+            - Set $subIntent:agentCareAdvocate
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"provider","doctor", "physician", "primary care","healthcare provider","provider relations","provider services", "provider information","verify provider","check provider","confirm provider","provider relations","agent provider relations".
+            - Set $headIntent:agent
+            - Set $subIntent:agentProviderRelations
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"returning call", "return call","returning your call","returning phone call","callback","calling back","called me","missed call","received a call","got a call","disconnected","returning voicemail".
+            - Set $headIntent:agent
+            - Set $subIntent:agentReturningCall
+        - If user_utterance contains keywords or phrases like:"representative", "agent","customer service","live person","operator","speak to","talk to","connect me","need to speak","need to talk".
+            - Set $headIntent:agent
+            - Set $subIntent:agentGeneral
+        - If user_utterance contains keywords or phrases like:"appointment", "schedule","scheduling","make an appointment","book appointment","cancel appointment", "reschedule","setup appointment".
+            - Set $headIntent:appointment
+            - Set $subIntent:appointmentGeneral
+        - If user_utterance contains keywords or phrases like:"cancel", "cancellation","canceling","terminate","termination","drop coverage","end service","stop service".
+            - Set $headIntent:cancel
+            - Set $subIntent:cancelService
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"cancer","my cancer resource","my cancer services","cancer request".
+            - Set $headIntent:cancer
+            - Set $subIntent:cancerGeneral
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:"card","id card", "insurance card", "member id", "new card", "replacement card","activate card","card balance".
+            - Set $headIntent:cards
+            - Set $subIntent:cardsID
+        - If user_utterance contains keywords or phrases like:"concurrent review", "concurrent", "submit concurrent review","complete concurrent review".
+            - Set $headIntent:agent
+            - Set $subIntent:careAdvocateCRU
+        - If user_utterance contains keywords or phrases like:"clinical admission", "clinical admission request", "admission of clinical".
+            - Set $headIntent:clinical
+            - Set $subIntent:clinicalAdmission
+        - If user_utterance contains keywords or phrases like:"clinical submission", "submit clinical","clinical submission request","clinical submission authorization".
+            - Set $headIntent:clinical
+            - Set $subIntent:clinicalSubmission
+        - If user_utterance contains keywords or phrases like:"treatment","treatment plan","treatment program","treatment options","detox","opioid treatment","therapy treatment"
+            - Set $headIntent:clinical
+            - Set $subIntent:clinicalTreatment
+        - If user_utterance contains keywords or phrases like:"coordination of benefits","COB","update COB","update coordination of benefits","primary secondary insurance", "coordination of benefit".
+            - Set $headIntent:cob
+            - Set $subIntent:cob
+        - If user_utterance contains keywords or phrases like:"cobra","cobra coverage","cobra insurance","cobra phone number","cobra review".
+            - Set $headIntent:cobraCoverage
+            - Set $subIntent:Behavioral
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"cpt code","procedure code","billing code","diagnosis code","authorization code","eap code","medical codes".
+            - Set $headIntent:cptCode
+            - Set $subIntent:cptCode
+        - If user_utterance contains keywords or phrases like:"credentialing", "credential","network status","network provider","in-network","contracting","provider enrollment","verify network","recredentialing".
+            - Set $headIntent:credentialing
+            - Set $subIntent:credentialingGeneral
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"crisis","crisis line", "suicidal","suicidal depression","severe depression","detox emergency".
+            - Set $headIntent:emergency
+            - Set $subIntent:crisisEmergency
+        - If user_utterance contains keywords or phrases like:"demographic update", "change demographics","demographic information","demographic request","demographic error".
+            - Set $headIntent:demographicUpdate
+            - Set $subIntent:demographicUpdate
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"dental","dentist", "dental coverage","dental insurance","dental claim","dental benefits","dental provider".
+            - Set $headIntent:dental
+            - Set $subIntent:dental
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"disability","learning disability", "short term disability".
+            - Set $headIntent:disability
+            - Set $subIntent:disability
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:"form","forms","claim form","authorization form","reimbursement form","paperwork".
+            - Set $headIntent:disAmBig
+            - Set $subIntent:disAmBigForms
+        - If user_utterance contains keywords or phrases like:"status","account status","check status","update status","status of","status for"
+            - Set $headIntent:disAmBig
+            - Set $subIntent:disAmBigStatus
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like "clarification on a letter",confusion about letter received","about a letter","I need to speak somebody about a letter"
+            - Set $headIntent:disAmBig
+            - Set $subIntent:disAmBigLetter
+        - If user_utterance contains keywords or phrases like: "discharge", "discharge review","discharge planning","discharge authorization","discharge notification", "discharge information","discharge date","submit discharge","report discharge","discharge paperwork","discharge transportation","mental health discharge"
+            - Set $headIntent:discharge
+            - Set $subIntent:discharge
+        - If user_utterance contains keywords or phrases like:"chiropractic care", "find a chiropractor","looking for a chiropractor","one to find chiropractor","or chiropractor".
+            - Set $headIntent:doctor
+            - Set $subIntent:doctorFindChangeChiropractor
+        - If user_utterance contains keywords or phrases like:"find a counselor", "find a therapist","find a psychologist","find a psychiatrist","mental health counseling", "behavioral health counseling","counseling services","therapy services","psychological evaluation","psychiatric evaluation","family counseling"
+            - Set $headIntent:doctor
+            - Set $subIntent:doctorFindChangeCounselor
+        - If user_utterance contains keywords or phrases like: "enrollment status", "insurance status","enroll status","status of enrollment".
+            - Set $headIntent:enrollmentStatus
+            - Set $subIntent:enrollmentStatus
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"find a doctor","find a provider","find a physician","find a specialist","find a clinic","find a facility","looking for a doctor","looking for a provider","looking for a physician","looking for a specialist","need a doctor","need a provider","need a physician","need a specialist","change doctor", "change provider","doctor list","provider list","doctor referral","provider referral","need referral","check provider","verify provider"
+            - Set $headIntent:doctor
+            - Set $subIntent:doctorFindChangeDR
+        - If user_utterance contains keywords or phrases like:"physical therapist", "looking for a physical therapist","physical therapy".
+            - Set $headIntent:doctor
+            - Set $subIntent:doctorFindChangePhysicalTherapy
+        - If user_utterance contains keywords or phrases like:"eft","eft payment", "eft status","electronic","electronic billing","electronic funds transfer","form for electronic claims","missing electronic payment","setup direct deposit".
+            - Set $headIntent:eft
+            - Set $subIntent:eft
+        - If user_utterance contains keywords or phrases like:"eap","employee assistance","employee assistance plan","employee assistance program","eap activation","eap approval","eap benefit","eap counseling","eap coverage","eap eligibility","eap inquiry","eap provider","mental health eap","behavioral health eap","access eap portal","activate eap", "apply for eap","find eap","questions about eap".
+            - Set $headIntent:employeeAssistance
+            - Set $subIntent:employeeAssistancePlan
+        - If user_utterance contains keywords or phrases like:"authorization eap", "authorization number for eap","eap authorization","eap authorization number","employee assistance program authorization","eap auth","need eap authorization","requesting eap authorization","obtain eap authorization","confirm eap authorization","retro eap authorization".
+            - Set $headIntent:employeeAssistance
+            - Set $subIntent:employeeAssistancePlanAuth
+        - If user_utterance contains keywords or phrases like:"authorization referral management","referral management","authorization referral".
+            - Set $headIntent:employeeAssistance
+            - Set $subIntent:employeeAssistancePlanManagerReferral
+        - If user_utterance contains keywords or phrases like:"application", "application status","application questions","enroll","enrollment", "enrollment support","open enrollment","open enrollment question","register","registering","signup","signingup","signing up","renew","renewing","buy insurance","change an application","verify enrollment","renew my insurance".
+            - Set $headIntent:enrollment
+            - Set $subIntent:enrollment
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"extension","calling extension","claim extension","clinical extension","medical extension","insurance extension","gap extension","requested extension","requesting extension","transfer to extension","i need an extension","i have extension","connect me to extension"
+            - Set $headIntent:extension
+            - Set $subIntent:extension
+        - If user_utterance contains keywords or phrases like:"fax","fax number", "fax number please","fax number for claims","fax number for medical records","authorization fax","claim fax","need fax number","verify fax number","followup on fax","i need to fax","would like to fax".
+            - Set $headIntent:fax
+            - Set $subIntent:fax
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"fee","fee schedule", "lookup fee schedule","check fee schedule","schedules".
+            - Set $headIntent:fee
+            - Set $subIntent:feeSchedule
+        - If user_utterance contains keywords or phrases like:"account","account information","account number","account issue","account questions","my account","accessing my account","activate card","bank account","charges on my account","check on my account","reset account","review my account","flex","flex spending","flexible spending account","fsa reimbursement","fsa","fsa account","fsa contributions","savings account","replace card"
+            - Set $headIntent:financialAccount
+            - Set $subIntent:financialAccount
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"fraud","concern about fraud","possible fraud","reporting fraud activity","fraud treatments","fraud urine"
+            - Set $headIntent:fraud
+            - Set $subIntent:fraud
+        - If user_utterance contains keywords or phrases like:"leave","leave status", "apply for leave","leave and benefits","medical leave","question about leave"
+            - Set $headIntent:leaveofAbsence
+            - Set $subIntent:leaveofAbsence
+        - If user_utterance contains keywords or phrases like:"legal","legal advice", "legal assistance","legal services","legal help","legal counsel","lawyer","attorney","legal benefit","legal question","legal referral","power of attorney","financial","financial assistance","financial concerns","financial information","financial issues","financial payment", "audit"
+            - Set $headIntent:legalFinancial
+            - Set $subIntent:legalFinancial
+        - If user_utterance contains keywords or phrases like:"medical","medical benefits","medical coverage","medical bill","medical plan","medical question","medical assistance","medical eligibility","medical reimbursement","medical record","medical consultation","medical therapy","medical review","medical coding","medical procedure","medical information","blood test","bloodwork","mammogram","catscan","genetic testing","surgery","dermatologist","dermatology","urology"
+            - Set $headIntent:medical
+            - Set $subIntent:medical
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:"allergic","emergency","heat","fragment","medical emergency"
+            - Set $headIntent:medical
+            - Set $subIntent:medicalEmergency
+        - If user_utterance contains keywords or phrases like:"dme","medical equipment","medical supplies","order supplies","how to order supplies","i need supplies","strips"
+            - Set $headIntent:medical
+            - Set $subIntent:medicalEquipment
+        - If user_utterance contains keywords or phrases like:"medical records","medical record request","medical records request","medical records review","record request","records","records request","request for medical records","patient records","lookup records","need records","access records"
+            - Set $headIntent:medical
+            - Set $subIntent:medicalRecords
+        - If user_utterance contains keywords or phrases like:"better medical necessity","medical necessity".
+            - Set $headIntent:medical
+            - Set $subIntent:medicalNecessity
+        - If user_utterance contains keywords or phrases like:"member id","member id number","member identification number","id number","identification number","subscriber id","policy number","payer id","group number","alternate id number","help with member id","find my member id","looking for member id","need member id","need my id number","need my member id","need my subscriber id","need my group number","optum id number","verify my member id"
+            - Set $headIntent:memberID
+            - Set $subIntent:memberIDGeneral
+        - If user_utterance contains keywords or phrases like:"change password","forgot my password","password reset","reset password","password issues","password account","id password".
+            - Set $headIntent:websiteSupport
+            - Set $subIntent:onlinePassword
+        - If user_utterance contains keywords or phrases like:"login","logging in","cannot login","cant login","unable to login","account is locked","locked out","access account","cannot access","cant access","portal","website","web support","online access","online account","help logging in","issues logging in","trouble logging in","employer portal","optum website","reset login","login problem".
+            - Set $headIntent:websiteSupport
+            - Set $subIntent:onlineQuestions
+        - If user_utterance contains keywords or phrases like:"review","retro review","retroactive review","review request","review status","care review","chart review","utilization review","grievance review","insurance review","schedule review"
+            - Set $headIntent:review
+            - Set $subIntent:review
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"peer review","peer to peer","schedule peer review","schedule peer to peer","peer review request","peer review results","peer review appointment","peer review scheduling","peer review support","behavioral health peer review","dental peer review","health peer review".
+            - Set $headIntent:review
+            - Set $subIntent:peerReview
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:"pharmacy","prescription","prescriptions","prescription refill","refill prescription","medication","medicine","meds","drug","drug coverage","pharmacy coverage","pharmacy benefits","pharmacy question","pharmacist","order medication","mail order medication","optum rx","refill","need prescription","need medication","prescription approval","prescription status","prescription denial".
+            - Set $headIntent:pharmacy
+            - Set $subIntent:pharmacy
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like: "precertification", "precertification requirements", "precertification request".
+            - Set $headIntent:precertification
+            - Set $subIntent:preCertification
+        - If user_utterance contains keywords or phrases like:"admission","admission notification","notice of admission","hospitalization","reporting admit", "certification for admission","preapproval for admission","request for admission","schedule admission","reporting admission"
+            - Set $headIntent:preApproval
+            - Set $subIntent:preApprovalAdmission
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:" "acute admission","acute psychiatric admission","behavioral health admission","mental health admission","psychiatric admission","psych admission","substance abuse admission","substance use admission","detox admission","rehab admission","residential admission","partial hospitalization","behavioral mental health admission"
+            - Set $headIntent:preApproval
+            - Set $subIntent:preApprovalAdmissionMentalHealth
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"physical therapy admission", "physical therapy prior admission","prior authorization physical therapy","prior auth for physical therapy","request physical therapy authorization","check physical therapy authorization", "physical therapy preauthorization"
+            - Set $headIntent:preApproval
+            - Set $subIntent:preApprovalAdmissionPhysicalTherapy
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"authorization for inpatient","authorization for inpatient admission","inpatient authorization","inpatient prior authorization","inpatient preauthorization","inpatient precert","preauthorization for inpatient","preauthorization inpatient","prior authorization for inpatient","prior authorization inpatient","request inpatient authorization","requesting inpatient authorization","need authorization for inpatient","need preauthorization for inpatient", "initial authorization for inpatient".
+            - Set $headIntent:preApproval
+            - Set $subIntent:preApprovalInpatient
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"mental health authorization","behavioral health authorization","applied behavior analysis authorization", "psychological testing authorization","psychiatric authorization","partial hospitalization authorization","residential mental health authorization"
+            - Set $headIntent:preApproval
+            - Set $subIntent:preApprovalMentalHealth
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"outpatient authorization","outpatient prior authorization","outpatient preauthorization","behavioral health outpatient","mental health outpatient","substance abuse outpatient","methadone maintenance outpatient","tms outpatient".
+            - Set $headIntent:preApproval
+            - Set $subIntent:preApprovalOutpatient
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"physical therapy", "help for physical therapy","request physical therapy","check physical therapy","physical therapy approval"
+            - Set $headIntent:preApproval
+            - Set $subIntent:preApprovalPhysicalTherapy
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like:"authorization status", "check authorization", "check authorization status","checking authorization","status of authorization","prior authorization status","preauthorization status","retro authorization status","check prior authorization","check preauthorization","check retro authorization", "update authorization status", "pre-approval upcoming procedure", "upcoming procedure"
+            - Set $headIntent:preApproval
+            - Set $subIntent:preApprovalStatus
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like: "nurse","nurseline", "nurse advice","call nurse","speak to a nurse","talk to a nurse","get a nurse","need nurse", "calling the nurse""nurse call","nurse service","nurse representative","nurse opinion", "nurse practitioner","managed nurse", "transfer nurse","care advice","advice nurse", "activate nurse","find a nurse","looking for a nurse"
+            - Set $headIntent:contact
+            - Set $subIntent:preventionNurseline
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like: "reference number", "check reference number","calling for reference number","follow-up on reference number", "following up on reference number","have a reference number","i have a reference number", "hes reference number","reference number id"
+            - Set $headIntent:contact
+            - Set $subIntent:referenceNumber
+        - If user_utterance contains keywords or phrases like: "retro review", "retroactive review","retro review request","retro review status","retro review process", "retro review department","retro second review","retro step down review" "follow-up retro review","direct retro review","care review","chart review","concur review","current review", "dispute review","grievance review","insurance review" "utilization review","review request", "urgent review","second level review"
+            - Set $headIntent:review
+            - Set $subIntent:review
+        - If user_utterance contains keywords or phrases like: "single case agreement","single case","single case authorization","single case request","single case setup","single case denial","single case status","request single case agreement","renew single case agreement","extend single case agreement","obtain single case agreement","check single case agreement","verify single case agreement","initiate single case agreement"
+            - Set $headIntent:agreement
+            - Set $subIntent:singleCaseAgreement
+        - If user_utterance contains keywords or phrases like: "spanish","speak spanish""somebody speak spanish","need spanish","spanish agent","espanol"
+            - Set $headIntent:spanish
+            - Set $subIntent:spanish
+        - If user_utterance contains keywords or phrases like: "autism","autism navigator","special needs navigator","navigator for autism","navigator for special needs", "autism support","special needs support"
+            - Set $headIntent:contact
+            - Set $subIntent:specialNeedsNavigator
+        - If user_utterance contains keywords or phrases like: "submission", "submission request","call submission","calling about a submission","check submission", "resubmission","medical submission","optical submission","retro submission","fragment submission","question on submission"
+            - Set $headIntent:submission
+            - Set $subIntent:submissionGeneral
+        - If user_utterance contains keywords or phrases like: "submission status", "check submission status","check clinical submission","on a clinical submission","submission of the status","fragment submission status"
+            - Set $headIntent:submission
+            - Set $subIntent:submissionStatus
+        - If user_utterance contains keywords or phrases like: "transplant", "transplant services","organ transplant","transplant surgery","transplant center"
+            - Set $headIntent:transplants
+            - Set $subIntent:transplants
+        - If user_utterance contains keywords or phrases like: "transportation", "transport","schedule transportation","setup transportation","arrange transportation","book transportation","medical transportation","patient transportation","psychiatric transportation","transportation services","transportation service","transportation to doctor", "transportation to appointment"
+            - Set $headIntent:transportation
+            - Set $subIntent:transportationServices
+        - If user_utterance contains keywords or phrases like: "travel","travel lodging","lodging benefit","travel services","travel patient","travel request","lodging request"
+            - Set $headIntent:travel
+            - Set $subIntent:travelLodging
+        - If user_utterance contains keywords or phrases like: "consent","consent on file","verbal consent","verbal authorization","get verbal consent","provide verbal consent", "give consent","give permission","need verbal consent","need verbal authorization","verbal consent agreement"
+            - Set $headIntent:verbal
+            - Set $subIntent:verbalConsent
+        - If user_utterance contains keywords or phrases like: "vision","vision provider","vision department","vision information","vision therapy","eye","eye pain", "eyecare","find an eye doctor","find vision","ophthalmologist","my vision","recent vision","i need vision","beth district vision request","clarification about ophthalmologist visit coverage","in-network optometrist"
+            - Set $headIntent:vision
+            - Set $subIntent:vision
+            - Set $otherIntent:true
+        - If user_utterance contains keywords or phrases like: "health assessment", "annual health assessment","initial assessment","assessment request","coach","coaching", "health coaching","smoking cessation","quit smoking","nutritionist","dietitian","weight loss","weight loss program","weight loss counseling","weight loss drugs"
+            - Set $headIntent:wellness
+            - Set $subIntent:wellnesCoaching
+        - If user_utterance contains keywords or phrases like: "wellness","wellness appointment","wellness assessment","wellness check","wellness plan","wellness incentive", "incentive","incentives","gym","gym membership","fitness","exercise programs","gift card"
+            - Set $headIntent:wellness
+            - Set $subIntent:wellnessRewards
+        - If user_utterance contains keywords or phrases like: "birth control" "contraception" "family planning" "breast pump" "milk expression" "lactation consultant" "breastfeeding support" "maternity benefits" "maternity coverage" "maternal health benefits" "maternity leave" "pregnancy cramps" "women’s health" "prenatal care" "pregnant" "maternity and benefits" "maternity fragment"
+            - Set $headIntent:womens
+            - Set $subIntent:womensHealth
+        - If user_utterance contains keywords or phrases like:“back pain","pain in back muscles","muscle pain in back","back pain support","help with back muscle pain","information on back pain","check back pain","back pain assistance","back pain explanation"
+            - Set $headIntent:agent
+            - Set $subIntent:orthoAdvocacy
+        - If user_utterance contains keywords or phrases like:“certificate of coverage","coverage certificate","verify coverage certificate","check coverage certificate status","coverage verification","certificate information","explain coverage certificate","coverage certificate inquiry"
+            - Set $headIntent:medicalHelp
+            - Set $subIntent:certificateOfCoverage
+        - If user_utterance contains keywords or phrases like:“psych testing”, “psychological testing”, “psych evaluation”, “psych test”, “mental health test”, “start psych testing”, “begin psychological testing”, “request psych testing”
+            - Set $headIntent:psychTesting
+            - Set $subIntent:psychTesting
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:“authorization”, “authorization request”,“authorization pending”,“authorize”,“approval”,“verify authorization”,“confirm authorization”,“get authorized”
+            - Set $headIntent:authorization
+            - Set $subIntent:authorization
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:“network services”, “request network services”,“enable network services”,“activate network services”,“disable network services”,“network service status”,“network service support”,“network troubleshooting”
+            - Set $headIntent:networkService
+            - Set $subIntent:networkService
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:“medication assisted treatment”,“medication assisted therapy”,“medication assisted care”,“MAT services”, “medication treatment support”,“start medication assisted treatment”,“medication assisted support”, “medication”, Medicication-assisted treatment"
+            - Set $headIntent:medicationAssistedTreatment
+            - Set $subIntent:medicationAssistedTreatment
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:“outpatient program”, “outpatient clinic", “enroll in outpatient, “outpatient support”
+            - Set $headIntent:outpatient
+            - Set $subIntent:intensiveOutpatient
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:“opioid treatment program”,“OTP”,“enroll in OTP”,“opioid treatment support”,“OTP support”,“OTP services”, “help with opioid treatment”,“start opioid treatment”
+            - Set $headIntent:opioidTreatment
+            - Set $subIntent:opioidTreatment
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:“transition of care”, “care transition”,“transition of care services”,“care transition support”,“transition of care details”,“start transition of care”,“care transfer”,“care transition planning”
+            - Set $headIntent:transitionCare
+            - Set $subIntent:transitionCare
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:“inpatient services”, “inpatient program”,“inpatient treatment”,“start inpatient services”,“arrange inpatient treatment”,“begin inpatient program”,“inpatient services option”
+            - Set $headIntent:inpatientTreatment
+            - Set $subIntent:inpatientTreatment
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:“applied behavior analysis”,“applied behavior analysis services”,“applied behavior analysis program”,“applied behavior analysis program details”,“start applied behavior analysis”,“proceed with applied behavior analysis”,“applied behavior analysis treatment”
+            - Set $headIntent:appliedBehavioralAnalysis
+            - Set $subIntent:appliedBehavioralAnalysis
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:“non routine outpatient services”,“non routine outpatient support”,“question about non routine outpatient services”, “ambulatory detox”,“ambulatory detox services”,
+            - Set $headIntent:nonRoutine
+            - Set $subIntent:outpatientTreatment
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:"letter","received a letter","letter in the mail","decision letter","correspondence".
+            - Set $headIntent:letters
+            - Set $subIntent:letters
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:“appeal","appeals", "need help with appeal review","Single case appeal"
+            - Set $headIntent:appeal
+            - Set $subIntent:appeal
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like:"center of excellence","coe" "find center of excellence","find coe"
+            - Set $headIntent:find coe
+            - Set $subIntent:facilityFindCOE
+        - If user_utterance contains keywords like "401k","401k plan"
+            - Set $headIntent:401k
+            - Set $subIntent:401k
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like "menu","main menu","wrap menu", "something else"
+            - Set $headIntent:menu
+            - Set $subIntent:menuRequest
+            - Set $tfnIntent:true
+        - If user_utterance contains keywords or phrases like "acn", "attachement control number"
+            - Set $headIntnt:acn
+            - Set $subIntent:acn
+            - Set $tfnIntent:true
+        - If user_utterance contains vague, incomplete, or unclear phrases that indicate intent but lack enough detail to map to a specific intent mentioned above such as:"service","program","health","policy",
+            - Set $headIntent:vague
+            - Set $subIntent:vagueGeneral
+            - Set $tfnIntent:true
+    - Route to ${FLOW:Post Intent Detection}
+    - Step 2 **No MATCH Handling**
+        - If the user's utterance doesn't match any of the conditions From step 1:
+            - # Response Sequence (if any condition above is true):
+                - First Attempt:
+                    - Respond : "I didn't get that. I can help you with your behavioral health questions. Tell me what are you calling about today?"
+                - Second Attempt:
+                    - Respond:  "I didn't get that. Lets try that one more time. I can help you with your behavioral health questions. Tell me what are you calling about today?"
+                - Third Attempt:
+                    - Set $headIntent = "outofscope"
+                    - Set $subIntent = "outofscope"
+                    - Set $transferReason = "M"
+                    - Route to ${FLOW:Post Intent Detection}
