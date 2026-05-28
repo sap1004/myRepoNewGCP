@@ -21,7 +21,7 @@ from dfcx_scrapi.core.playbooks import Playbooks
 def normalize_text(x):
     if x is None:
         return None
-    return str(x).strip().lower().replace(" ", "")
+    return str(x).strip().lower().replace(" ", "").replace("nan","")
 
 def ensure_text(x):
     if x is None:
@@ -136,12 +136,13 @@ def process_sheet(df, sdk_client, project_id, location, agent_uuid,
             sdk_client, session_paths[idx], utterances[idx], language_code
         )
         # Print first utterance params immediately for verification
+        #print(f"  Agent Response: {result['response_text'] or 'EMPTY'}")
         if idx == 0:
             print("\n" + "="*60)
             print(f"  FIRST UTTERANCE CHECK — Sheet: {sheet_name}")
             print("="*60)
             print(f"  Utterance     : {utterances[0]}")
-            print(f"  Agent Response: {result['response_text'] or 'EMPTY'}")
+            #print(f"  Agent Response: {result['response_text'] or 'EMPTY'}")
             print(f"  Parameters    : {json.dumps(result['params_dict'], indent=4, default=str)}")
             print(f"  headintent    : {result['params_dict'].get('headIntent', 'NOT FOUND')}")
             print(f"  subintent     : {result['params_dict'].get('subIntent', 'NOT FOUND')}")
@@ -159,6 +160,7 @@ def process_sheet(df, sdk_client, project_id, location, agent_uuid,
     rows = []
     for idx, r in enumerate(raw_results):
         params           = r["params_dict"]
+        #detected_head    = extract_param(params, "program")
         detected_head    = extract_param(params, "headIntent")
         detected_sub     = extract_param(params, "subIntent")
         head_match       = normalize_text(expected_head_intent[idx]) == normalize_text(detected_head)
