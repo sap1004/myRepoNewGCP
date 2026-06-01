@@ -1,107 +1,22 @@
-"""
-Unary diagnostic, matching your ORIGINAL code's behavior:
-- reads agent_id + playbook_display_name from configPlayBook1.properties
-- resolves the playbook display name -> resource path via dfcx_scrapi
-- passes current_playbook in QueryParameters (same as your real script)
-- runs ONE utterance and reports where headIntent / subIntent appear (if at all)
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2> python .\playbook_Test6.py
+Resolving playbook: 'Claims'...
+2026-06-01 11:32:49 INFO     Found user creds, skipping global scopes...
+Resolved: projects/aphmoojo-3bbf-tayr-6x95-uz4byo/locations/us-central1/agents/9d138b6f-30b2-48c5-a3d6-5dc49ed5307c/playbooks/a53d60d4-c8d8-4e76-a05b-4f36843f7c92
 
-Run from the same folder as your config:  python diagnose_one.py
-"""
-import json
-import uuid
-import configparser
-from google.cloud import dialogflowcx_v3beta1 as dialogflow
-from google.protobuf.json_format import MessageToDict
-from dfcx_scrapi.core.playbooks import Playbooks
+Endpoint  : us-central1-dialogflow.googleapis.com:443
+Agent     : projects/aphmoojo-3bbf-tayr-6x95-uz4byo/locations/us-central1/agents/9d138b6f-30b2-48c5-a3d6-5dc49ed5307c
+Utterance : claims
+Session   : projects/aphmoojo-3bbf-tayr-6x95-uz4byo/locations/us-central1/agents/9d138b6f-30b2-48c5-a3d6-5dc49ed5307c/sessions/e7187e53-f57c-4e1d-a2a9-e8198276a2dd
 
-# --- Read config the same way the real script does --------------------------
-config = configparser.ConfigParser()
-config.read("configPlayBook1.properties")
+Full response written to unary_dump.json
 
-agent_id              = config.get("dialogflow", "agent_id")
-playbook_display_name = config.get("input", "playbook_display_name")
-language_code         = config.get("input", "language_code", fallback="en")
+queryResult keys      : ['text', 'languageCode', 'responseMessages', 'intentDetectionConfidence', 'diagnosticInfo', 'match', 'advancedSettings', 'generativeInfo']
+queryResult.parameters: {}
+diagnosticInfo keys   : ['Session Id', 'Response Id']
+generativeInfo keys   : ['currentPlaybooks', 'actionTracingInfo']
 
-UTTERANCE = "appointment"   # one utterance to probe
-# ----------------------------------------------------------------------------
-
-parts = agent_id.split("/")
-project_id, location, agent_uuid = parts[1], parts[3], parts[5]
-
-api_endpoint = ("dialogflow.googleapis.com:443" if location == "global"
-                else f"{location}-dialogflow.googleapis.com:443")
-
-# --- Resolve playbook display name -> resource path (same as original) ------
-print(f"Resolving playbook: '{playbook_display_name}'...")
-pb_client     = Playbooks(agent_id=agent_id)
-playbooks_map = pb_client.get_playbooks_map(agent_id=agent_id, reverse=True)
-if playbook_display_name not in playbooks_map:
-    raise ValueError(
-        f"Playbook '{playbook_display_name}' not found.\n"
-        f"Available: {list(playbooks_map.keys())}"
-    )
-playbook_resource_path = playbooks_map[playbook_display_name]
-print(f"Resolved: {playbook_resource_path}\n")
-
-client = dialogflow.SessionsClient(client_options={"api_endpoint": api_endpoint})
-session_path = client.session_path(project_id, location, agent_uuid, str(uuid.uuid4()))
-
-
-def find_all_paths(obj, target_key, path=""):
-    hits = []
-    if isinstance(obj, dict):
-        for k, v in obj.items():
-            here = f"{path}.{k}"
-            if k == target_key:
-                hits.append((here, v))
-            hits += find_all_paths(v, target_key, here)
-    elif isinstance(obj, list):
-        for i, item in enumerate(obj):
-            hits += find_all_paths(item, target_key, f"{path}[{i}]")
-    return hits
-
-
-# --- Exact same request shape as your original code -------------------------
-request = dialogflow.DetectIntentRequest(
-    session=session_path,
-    query_input=dialogflow.QueryInput(
-        text=dialogflow.TextInput(text=UTTERANCE),
-        language_code=language_code,
-    ),
-    query_params=dialogflow.QueryParameters(
-        current_playbook=playbook_resource_path
-    ),
-)
-
-print(f"Endpoint  : {api_endpoint}")
-print(f"Agent     : {agent_id}")
-print(f"Utterance : {UTTERANCE}")
-print(f"Session   : {session_path}\n")
-
-response = client.detect_intent(request=request)
-full = MessageToDict(response._pb)
-
-with open("unary_dump.json", "w") as f:
-    json.dump(full, f, indent=2, default=str)
-print("Full response written to unary_dump.json\n")
-
-qr = full.get("queryResult", {})
-print(f"queryResult keys      : {list(qr.keys())}")
-print(f"queryResult.parameters: {qr.get('parameters', {})}")
-if "diagnosticInfo" in qr:
-    print(f"diagnosticInfo keys   : {list(qr['diagnosticInfo'].keys())}")
-else:
-    print("diagnosticInfo        : NOT PRESENT")
-# generativeInfo is where playbook output shows up, if any
-if "generativeInfo" in qr:
-    print(f"generativeInfo keys   : {list(qr['generativeInfo'].keys())}")
-print()
-
-for key in ("headIntent", "subIntent", "head_intent", "sub_intent"):
-    hits = find_all_paths(full, key)
-    if hits:
-        print(f"'{key}' FOUND at:")
-        for p, v in hits:
-            print(f"    {p} = {v!r}")
-    else:
-        print(f"'{key}' NOT FOUND anywhere.")
+'headIntent' NOT FOUND anywhere.
+'subIntent' NOT FOUND anywhere.
+'head_intent' NOT FOUND anywhere.
+'sub_intent' NOT FOUND anywhere.
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2> 
