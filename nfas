@@ -1,46 +1,157 @@
-(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2> python .\playbook_Test6.py
-2026-06-01 12:07:27 INFO     Found user creds, skipping global scopes...
-=== responseMessages (what the playbook said) ===
-    'I understand you have a claims question. Are you looking for information on a claim status, Adjustment of claims, Appeal of claims, Denied claims? Or something else?"'
+"""
+Runs the SAME utterance through TWO methods and prints, for each, whether
+headIntent / subIntent were captured. Lets you see which method works.
 
-=== generativeInfo.currentPlaybooks ===
-[
-  "projects/aphmoojo-3bbf-tayr-6x95-uz4byo/locations/us-central1/agents/9d138b6f-30b2-48c5-a3d6-5dc49ed5307c/playbooks/a53d60d4-c8d8-4e76-a05b-4f36843f7c92"
+METHOD A: current_playbook path, inspecting conversationState + actionTracingInfo
+          (works for utterances specific enough to complete in one turn)
+METHOD B: seeded-session path -- pass session params + optional entry page via
+          query_params so the flow can reach "Post Intent Detection"
+          (fill in SEED_PARAMS / ENTRY_PAGE if/when you get them from the owner)
+
+Reads agent_id + playbook_display_name + language_code from config, exactly
+like the real script.
+
+Run:  python diagnose_methods.py
+Edit UTTERANCES below to try several of your real sheet rows.
+"""
+import json
+import uuid
+import configparser
+from google.cloud import dialogflowcx_v3beta1 as dialogflow
+from google.protobuf.json_format import MessageToDict
+from dfcx_scrapi.core.playbooks import Playbooks
+
+# ─── Config (same as real script) ───────────────────────────────────────────
+config = configparser.ConfigParser()
+config.read("configPlayBook1.properties")
+agent_id              = config.get("dialogflow", "agent_id")
+playbook_display_name = config.get("input", "playbook_display_name")
+language_code         = config.get("input", "language_code", fallback="en")
+
+# ─── Try a few of YOUR real utterances here (mix of broad + specific) ───────
+UTTERANCES = [
+    "claims",                 # broad   -> expect playbook to ask a follow-up
+    "claim status",           # specific-> may complete in one turn
+    "appeal a denied claim",  # specific
 ]
 
-=== generativeInfo.actionTracingInfo (FULL) ===
-{
-  "name": "projects/aphmoojo-3bbf-tayr-6x95-uz4byo/locations/us-central1/agents/9d138b6f-30b2-48c5-a3d6-5dc49ed5307c/playbooks/-/examples/-",
-  "actions": [
-    {
-      "userUtterance": {
-        "text": "claims"
-      }
-    },
-    {
-      "agentUtterance": {
-        "text": "I understand you have a claims question. Are you looking for information on a claim status, Adjustment of claims, Appeal of claims, Denied claims? Or something else?\""
-      }
-    }
-  ],
-  "conversationState": "OUTPUT_STATE_PENDING"
-}
+# ─── METHOD B inputs: fill these in IF the agent owner gives them to you ────
+# Session parameters the live platform injects before the first utterance.
+# Leave empty {} until you have them. Example shape once known:
+#   {"steering_bot": "bh_steering", "timestampFormat": "yyyy-MM-dd'T'HH:mm:ss",
+#    "conversationId": "test-123", "contextDataBots": {...}, ...}
+SEED_PARAMS = {}
+# Optional: full resource path of the page to ENTER at, e.g. the
+# "Post Intent Detection" start page. Leave None until known.
+#   "projects/.../agents/.../flows/<flowId>/pages/<pageId>"
+ENTRY_PAGE = None
+# ────────────────────────────────────────────────────────────────────────────
 
-Full response written to generative_dump.json
+parts = agent_id.split("/")
+project_id, location, agent_uuid = parts[1], parts[3], parts[5]
+api_endpoint = ("dialogflow.googleapis.com:443" if location == "global"
+                else f"{location}-dialogflow.googleapis.com:443")
+client = dialogflow.SessionsClient(client_options={"api_endpoint": api_endpoint})
 
-=== keys CONTAINING 'intent' (case-insensitive) ===
-    .queryResult.intentDetectionConfidence = 1.0
-(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2> python .\playbook_Test6.py
-Utterance : claims  (NO current_playbook)
+pb_client     = Playbooks(agent_id=agent_id)
+playbooks_map = pb_client.get_playbooks_map(agent_id=agent_id, reverse=True)
+playbook_resource_path = playbooks_map[playbook_display_name]
 
-currentFlow : Default Start Flow
-currentPage : Start Page
-match type  : NO_MATCH
-response    : ['Sorry, what was that?']
 
-Execution Sequence has 2 steps
+def new_session():
+    return client.session_path(project_id, location, agent_uuid, str(uuid.uuid4()))
 
-=== headIntent / subIntent NOT in any session params ===
 
-Full response written to noplaybook_dump.json
-(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2> 
+def find_first(obj, target_key):
+    """First non-empty string value for an exact key, depth-first."""
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k == target_key and isinstance(v, str) and v.strip():
+                return v.strip()
+        for v in obj.values():
+            r = find_first(v, target_key)
+            if r:
+                return r
+    elif isinstance(obj, list):
+        for x in obj:
+            r = find_first(x, target_key)
+            if r:
+                return r
+    return ""
+
+
+def report(label, full):
+    qr = full.get("queryResult", {})
+    head = find_first(full, "headIntent")
+    sub  = find_first(full, "subIntent")
+    gi   = qr.get("generativeInfo", {})
+    state = gi.get("actionTracingInfo", {}).get("conversationState", "(n/a)")
+    resp = [t for m in qr.get("responseMessages", [])
+            for t in m.get("text", {}).get("text", [])]
+    print(f"    [{label}]")
+    print(f"      conversationState : {state}")
+    print(f"      currentFlow/page  : "
+          f"{qr.get('currentFlow', {}).get('displayName', '(none)')} / "
+          f"{qr.get('currentPage', {}).get('displayName', '(none)')}")
+    print(f"      match type        : {qr.get('match', {}).get('matchType')}")
+    print(f"      agent said        : {resp}")
+    print(f"      >>> headIntent    : {head or 'NOT FOUND'}")
+    print(f"      >>> subIntent     : {sub or 'NOT FOUND'}")
+    return bool(head or sub)
+
+
+def method_a(utterance):
+    """current_playbook path."""
+    req = dialogflow.DetectIntentRequest(
+        session=new_session(),
+        query_input=dialogflow.QueryInput(
+            text=dialogflow.TextInput(text=utterance),
+            language_code=language_code,
+        ),
+        query_params=dialogflow.QueryParameters(
+            current_playbook=playbook_resource_path
+        ),
+    )
+    full = MessageToDict(client.detect_intent(request=req)._pb)
+    return report("METHOD A: current_playbook", full)
+
+
+def method_b(utterance):
+    """seeded-session path (uses SEED_PARAMS / ENTRY_PAGE if provided)."""
+    qp_kwargs = {}
+    if SEED_PARAMS:
+        qp_kwargs["parameters"] = SEED_PARAMS
+    if ENTRY_PAGE:
+        qp_kwargs["current_page"] = ENTRY_PAGE
+    query_params = dialogflow.QueryParameters(**qp_kwargs) if qp_kwargs else None
+
+    req = dialogflow.DetectIntentRequest(
+        session=new_session(),
+        query_input=dialogflow.QueryInput(
+            text=dialogflow.TextInput(text=utterance),
+            language_code=language_code,
+        ),
+        query_params=query_params,
+    )
+    full = MessageToDict(client.detect_intent(request=req)._pb)
+    note = "" if qp_kwargs else "  (SEED_PARAMS/ENTRY_PAGE empty -> plain entry)"
+    return report(f"METHOD B: seeded session{note}", full)
+
+
+print(f"Agent    : {agent_id}")
+print(f"Playbook : {playbook_display_name} -> {playbook_resource_path}")
+print(f"SeedParams set: {bool(SEED_PARAMS)} | EntryPage set: {bool(ENTRY_PAGE)}")
+print("=" * 70)
+
+summary = []
+for utt in UTTERANCES:
+    print(f"\nUTTERANCE: {utt!r}")
+    a = method_a(utt)
+    b = method_b(utt)
+    summary.append((utt, a, b))
+
+print("\n" + "=" * 70)
+print("SUMMARY (did the method return any intent?)")
+print(f"{'utterance':<28} {'METHOD A':<10} {'METHOD B':<10}")
+for utt, a, b in summary:
+    print(f"{utt:<28} {'YES' if a else 'no':<10} {'YES' if b else 'no':<10}")
