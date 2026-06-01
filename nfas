@@ -1,88 +1,33 @@
-"""
-Third diagnostic: dumps generativeInfo (currentPlaybooks + actionTracingInfo)
-in full and shows where intent-like values appear. Reads config + passes
-current_playbook exactly like your original code.
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2> python .\playbook_Test6.py
+2026-06-01 12:07:27 INFO     Found user creds, skipping global scopes...
+=== responseMessages (what the playbook said) ===
+    'I understand you have a claims question. Are you looking for information on a claim status, Adjustment of claims, Appeal of claims, Denied claims? Or something else?"'
 
-Run:  python diagnose_three.py
-"""
-import json
-import uuid
-import configparser
-from google.cloud import dialogflowcx_v3beta1 as dialogflow
-from google.protobuf.json_format import MessageToDict
-from dfcx_scrapi.core.playbooks import Playbooks
+=== generativeInfo.currentPlaybooks ===
+[
+  "projects/aphmoojo-3bbf-tayr-6x95-uz4byo/locations/us-central1/agents/9d138b6f-30b2-48c5-a3d6-5dc49ed5307c/playbooks/a53d60d4-c8d8-4e76-a05b-4f36843f7c92"
+]
 
-config = configparser.ConfigParser()
-config.read("configPlayBook1.properties")
-agent_id              = config.get("dialogflow", "agent_id")
-playbook_display_name = config.get("input", "playbook_display_name")
-language_code         = config.get("input", "language_code", fallback="en")
-UTTERANCE = "claims"
+=== generativeInfo.actionTracingInfo (FULL) ===
+{
+  "name": "projects/aphmoojo-3bbf-tayr-6x95-uz4byo/locations/us-central1/agents/9d138b6f-30b2-48c5-a3d6-5dc49ed5307c/playbooks/-/examples/-",
+  "actions": [
+    {
+      "userUtterance": {
+        "text": "claims"
+      }
+    },
+    {
+      "agentUtterance": {
+        "text": "I understand you have a claims question. Are you looking for information on a claim status, Adjustment of claims, Appeal of claims, Denied claims? Or something else?\""
+      }
+    }
+  ],
+  "conversationState": "OUTPUT_STATE_PENDING"
+}
 
-parts = agent_id.split("/")
-project_id, location, agent_uuid = parts[1], parts[3], parts[5]
-api_endpoint = ("dialogflow.googleapis.com:443" if location == "global"
-                else f"{location}-dialogflow.googleapis.com:443")
+Full response written to generative_dump.json
 
-pb_client     = Playbooks(agent_id=agent_id)
-playbooks_map = pb_client.get_playbooks_map(agent_id=agent_id, reverse=True)
-playbook_resource_path = playbooks_map[playbook_display_name]
-
-client = dialogflow.SessionsClient(client_options={"api_endpoint": api_endpoint})
-session_path = client.session_path(project_id, location, agent_uuid, str(uuid.uuid4()))
-
-request = dialogflow.DetectIntentRequest(
-    session=session_path,
-    query_input=dialogflow.QueryInput(
-        text=dialogflow.TextInput(text=UTTERANCE),
-        language_code=language_code,
-    ),
-    query_params=dialogflow.QueryParameters(
-        current_playbook=playbook_resource_path
-    ),
-)
-response = client.detect_intent(request=request)
-full = MessageToDict(response._pb)
-qr = full.get("queryResult", {})
-gi = qr.get("generativeInfo", {})
-
-print("=== responseMessages (what the playbook said) ===")
-for m in qr.get("responseMessages", []):
-    for t in m.get("text", {}).get("text", []):
-        print("   ", repr(t))
-print()
-
-print("=== generativeInfo.currentPlaybooks ===")
-print(json.dumps(gi.get("currentPlaybooks", {}), indent=2)[:2000])
-print()
-
-print("=== generativeInfo.actionTracingInfo (FULL) ===")
-ati = gi.get("actionTracingInfo", {})
-ati_str = json.dumps(ati, indent=2, default=str)
-print(ati_str[:8000])
-if len(ati_str) > 8000:
-    print(f"\n...[truncated, total {len(ati_str)} chars — see generative_dump.json]")
-print()
-
-with open("generative_dump.json", "w") as f:
-    json.dump(full, f, indent=2, default=str)
-print("Full response written to generative_dump.json\n")
-
-# Search for any intent-ish key names across the whole response
-def find_all_paths(obj, target_key, path=""):
-    hits = []
-    if isinstance(obj, dict):
-        for k, v in obj.items():
-            here = f"{path}.{k}"
-            if target_key.lower() in k.lower():
-                hits.append((here, v))
-            hits += find_all_paths(v, target_key, here)
-    elif isinstance(obj, list):
-        for i, item in enumerate(obj):
-            hits += find_all_paths(item, target_key, f"{path}[{i}]")
-    return hits
-
-print("=== keys CONTAINING 'intent' (case-insensitive) ===")
-for p, v in find_all_paths(full, "intent"):
-    sval = repr(v)
-    print(f"    {p} = {sval[:120]}")
+=== keys CONTAINING 'intent' (case-insensitive) ===
+    .queryResult.intentDetectionConfidence = 1.0
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2> 
