@@ -1,101 +1,45 @@
-"""
-Standalone diagnostic. Runs ONE utterance through streaming detect intent
-with debugging info enabled, dumps the full response, and reports exactly
-where headIntent / subIntent appear (if at all).
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2> python .\playbook_Test6.py
+Utterance : appointment
+Session   : projects/PROJECT/locations/LOCATION/agents/AGENT_UUID/sessions/e590f5f4-7364-410b-b893-f15a85da4c47
 
-Fill in the 4 values below and run:  python diagnose_one.py
-"""
-import json
-import uuid
-from google.cloud import dialogflowcx_v3beta1 as dialogflow
-from google.protobuf.json_format import MessageToDict
+=== STREAMING (enable_debugging_info=True) ===
+Traceback (most recent call last):
+  File "C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2\venv\Lib\site-packages\google\api_core\grpc_helpers.py", line 149, in error_remapped_callable
+    return _StreamingResponseIterator(
+        result, prefetch_first_result=prefetch_first
+    )
+  File "C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2\venv\Lib\site-packages\google\api_core\grpc_helpers.py", line 71, in __init__
+    self._stored_first_result = next(self._wrapped)
+                                ~~~~^^^^^^^^^^^^^^^
+  File "C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2\venv\Lib\site-packages\grpc\_channel.py", line 538, in __next__
+    return self._next()
+           ~~~~~~~~~~^^
+  File "C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2\venv\Lib\site-packages\grpc\_channel.py", line 956, in _next
+    raise self
+grpc._channel._MultiThreadedRendezvous: <_MultiThreadedRendezvous of RPC that terminated with:
+        status = StatusCode.UNIMPLEMENTED
+        details = "Received http2 header with status: 404"
+        debug_error_string = "UNKNOWN:Error received from peer  {grpc_message:"Received http2 header with status: 404", grpc_status:12}"
+>
 
-# ─── FILL THESE IN ──────────────────────────────────────────────────────────
-AGENT_ID  = "projects/PROJECT/locations/LOCATION/agents/AGENT_UUID"  # full path
-UTTERANCE = "appointment"     # the same utterance you test manually
-LANGUAGE  = "en"
-# ────────────────────────────────────────────────────────────────────────────
+The above exception was the direct cause of the following exception:
 
-parts = AGENT_ID.split("/")
-project_id, location, agent_uuid = parts[1], parts[3], parts[5]
-
-api_endpoint = ("dialogflow.googleapis.com:443" if location == "global"
-                else f"{location}-dialogflow.googleapis.com:443")
-client = dialogflow.SessionsClient(client_options={"api_endpoint": api_endpoint})
-session_path = client.session_path(project_id, location, agent_uuid, str(uuid.uuid4()))
-
-
-def find_all_paths(obj, target_key, path=""):
-    """Return every JSON path where target_key appears, with its value."""
-    hits = []
-    if isinstance(obj, dict):
-        for k, v in obj.items():
-            here = f"{path}.{k}"
-            if k == target_key:
-                hits.append((here, v))
-            hits += find_all_paths(v, target_key, here)
-    elif isinstance(obj, list):
-        for i, item in enumerate(obj):
-            hits += find_all_paths(item, target_key, f"{path}[{i}]")
-    return hits
-
-
-def run(enable_debug):
-    def gen():
-        yield dialogflow.StreamingDetectIntentRequest(
-            session=session_path,
-            query_input=dialogflow.QueryInput(
-                text=dialogflow.TextInput(text=UTTERANCE),
-                language_code=LANGUAGE,
-            ),
-            enable_debugging_info=enable_debug,
-        )
-    merged = {}
+Traceback (most recent call last):
+  File "C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2\playbook_Test6.py", line 64, in <module>
+    data = run(True)
+  File "C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2\playbook_Test6.py", line 54, in run
     responses = client.streaming_detect_intent(requests=gen())
-    for i, resp in enumerate(responses):
-        merged[f"response_{i}"] = MessageToDict(resp._pb)
-    return merged
-
-
-print(f"Utterance : {UTTERANCE}")
-print(f"Session   : {session_path}\n")
-
-print("=== STREAMING (enable_debugging_info=True) ===")
-data = run(True)
-
-fname = "streaming_dump.json"
-with open(fname, "w") as f:
-    json.dump(data, f, indent=2, default=str)
-print(f"Full response written to {fname}\n")
-
-# Top-level shape
-for rkey, rval in data.items():
-    print(f"{rkey} top-level keys: {list(rval.keys())}")
-    if "debuggingInfo" in rval:
-        print(f"  debuggingInfo keys: {list(rval['debuggingInfo'].keys())}")
-    dir_ = rval.get("detectIntentResponse", {})
-    qr = dir_.get("queryResult", {})
-    if qr:
-        print(f"  queryResult keys: {list(qr.keys())}")
-        print(f"  queryResult.parameters: {qr.get('parameters', {})}")
-        if "diagnosticInfo" in qr:
-            print(f"  diagnosticInfo keys: {list(qr['diagnosticInfo'].keys())}")
-print()
-
-for key in ("headIntent", "subIntent"):
-    hits = find_all_paths(data, key)
-    if hits:
-        print(f"'{key}' FOUND at:")
-        for p, v in hits:
-            print(f"    {p} = {v!r}")
-    else:
-        print(f"'{key}' NOT FOUND anywhere in the response.")
-print()
-
-# Also try the field name in snake_case, in case MessageToDict preserved it
-for key in ("head_intent", "sub_intent"):
-    hits = find_all_paths(data, key)
-    if hits:
-        print(f"'{key}' (snake_case) FOUND at:")
-        for p, v in hits:
-            print(f"    {p} = {v!r}")
+  File "C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2\venv\Lib\site-packages\google\cloud\dialogflowcx_v3beta1\services\sessions\client.py", line 1372, in streaming_detect_intent
+    response = rpc(
+        requests,
+    ...<2 lines>...
+        metadata=metadata,
+    )
+  File "C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2\venv\Lib\site-packages\google\api_core\gapic_v1\method.py", line 128, in __call__
+    return wrapped_func(*args, **kwargs)
+  File "C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2\venv\Lib\site-packages\google\api_core\timeout.py", line 130, in func_with_timeout
+    return func(*args, **kwargs)
+  File "C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2\venv\Lib\site-packages\google\api_core\grpc_helpers.py", line 153, in error_remapped_callable
+    raise exceptions.from_grpc_error(exc) from exc
+google.api_core.exceptions.MethodNotImplemented: 501 Received http2 header with status: 404
+(venv) PS C:\PythonDevelopment\AdkTest\SteeringPolicyBot\utteranceVersionTwo-main\BH_Steering_Generator1_Round2> 
