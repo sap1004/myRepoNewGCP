@@ -1,0 +1,1600 @@
+
+Current execution steps are: [{
+  "Step 1": {
+    "Type": "INITIAL_STATE",
+    "InitialState": {
+      "MatchedIntent": {
+        "Id": "00000000-0000-0000-0000-000000000000",
+        "DisplayName": "Default Welcome Intent",
+        "Type": "NLU",
+        "Score": 1.0,
+        "Active": true
+      },
+      "FlowState": {
+        "Name": "Post Intent Detection",
+        "FlowId": "873ccc2a-3d72-4102-97e3-7795fd0d5823",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "ENTERING_PAGE"
+        }
+      },
+      "SessionParameters": {
+        "headIntent": "appointment",
+        "subIntent": "appointmentGeneral",
+        "user_utterance": "appointment"
+      }
+    }
+  }
+}, {
+  "Step 2": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Post Intent Detection",
+        "FlowId": "873ccc2a-3d72-4102-97e3-7795fd0d5823",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "a150ef27-0bec-4964-b4c4-d2d65b02deaa",
+      "TriggeredCondition": "true",
+      "TargetPage": "6906ab6b-60d1-4aa4-ad74-5dec706d3bc5"
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "callerIntent": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027$session.params.callerIntent\u0027}}\"))",
+        "events": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027appointment\u0027, \u0027subIntent\u0027: \u0027appointmentGeneral\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\"))",
+        "repeatCounter": 0.0,
+        "userUtterance": null
+      },
+      "SystemFunctionResults": {
+        "$sys.func.IF": ["appointmentGeneral"],
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027$session.params.callerIntent\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: Wrong type of argument for function \"$sys.func.FORMAT_DATE\", expected 2th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027$session.params.headIntent\u0027, \u0027subIntent\u0027: \u0027$session.params.subIntent\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: Wrong type of argument for function \"$sys.func.FORMAT_DATE\", expected 2th argument to be one of type: [string]."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 3": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Post Intent Detection",
+        "FlowId": "873ccc2a-3d72-4102-97e3-7795fd0d5823",
+        "PageState": {
+          "Name": "Routing Conditions Check",
+          "PageId": "6906ab6b-60d1-4aa4-ad74-5dec706d3bc5",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 4": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Post Intent Detection",
+        "FlowId": "873ccc2a-3d72-4102-97e3-7795fd0d5823",
+        "PageState": {
+          "Name": "Routing Conditions Check",
+          "PageId": "6906ab6b-60d1-4aa4-ad74-5dec706d3bc5",
+          "Status": "TRANSITION_ROUTING",
+          "FormFilled": true
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "a96efc27-0b15-4e64-b7bb-3861711f5518",
+      "TriggeredCondition": "true",
+      "TargetFlow": "e95b268b-2b1b-43cc-9c29-82796349eff3"
+    },
+    "FunctionExecution": {
+      "Responses": [{
+        "text": {
+          "text": ["Sure. Let me help you with that."]
+        },
+        "responseType": "HANDLER_PROMPT",
+        "source": "VIRTUAL_AGENT"
+      }]
+    }
+  }
+}, {
+  "Step 5": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Intent NLU Config",
+        "FlowId": "e95b268b-2b1b-43cc-9c29-82796349eff3",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "94995d34-3cb0-4420-9a0a-781e40422834",
+      "TriggeredCondition": "true",
+      "TargetPage": "447ee6e0-528f-46c1-b6b7-4c189ac6057d"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 6": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Intent NLU Config",
+        "FlowId": "e95b268b-2b1b-43cc-9c29-82796349eff3",
+        "PageState": {
+          "Name": "NLU Config",
+          "PageId": "447ee6e0-528f-46c1-b6b7-4c189ac6057d",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "$request.webhook_status_code": 200.0,
+        "entityConfig": "appointment-appointmentgeneral",
+        "nluconfig": {
+          "botAction": "",
+          "func": "NatlNonClin",
+          "headIntent": "appointment",
+          "silentTransfer": false,
+          "subFunction": "AgentGeneral",
+          "subFunctionDetail": "",
+          "subIntent": "appointmentgeneral",
+          "transferReasonCode": "X"
+        },
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_GetNLUConfig\")"
+      },
+      "Webhook": {
+        "Status": "OK",
+        "Unauthorized FulfillmentResponse": false,
+        "ID": "aa00d061-3308-4123-af92-47250b046562",
+        "DisplayName": "Get Config",
+        "Tag": "getconfig",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/experiences/BHSteeringNLConfig/configuration/profiles/appointment-appointmentgeneral",
+        "Latency": "168 ms"
+      },
+      "SystemFunctionResults": {
+        "$sys.func.CONCATENATE": ["appointment-appointmentGeneral"],
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_GetNLUConfig\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }],
+        "$sys.func.LOWER": ["appointment-appointmentgeneral"]
+      }
+    }
+  }
+}, {
+  "Step 7": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Intent NLU Config",
+        "FlowId": "e95b268b-2b1b-43cc-9c29-82796349eff3",
+        "PageState": {
+          "Name": "NLU Config",
+          "PageId": "447ee6e0-528f-46c1-b6b7-4c189ac6057d",
+          "Status": "TRANSITION_ROUTING",
+          "FormFilled": true
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "6676f6e4-947b-456e-be2f-b3014efe84a2",
+      "TriggeredCondition": "$session.params.nluconfig !\u003d null",
+      "TargetPage": "8364a500-4815-4d70-9b2d-c08f95bcb1fa"
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_SetNLUConfig\")"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_SetNLUConfig\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 8": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Intent NLU Config",
+        "FlowId": "e95b268b-2b1b-43cc-9c29-82796349eff3",
+        "PageState": {
+          "Name": "Set Context",
+          "PageId": "8364a500-4815-4d70-9b2d-c08f95bcb1fa",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\", \"steering\", \"callerType\")": "$session.params.callerType",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\", \"steering\", \"ICMQuestionType\")": "$session.params.ICMQuestionType",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\", \"steering\", \"userUtterance\")": "appointment",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"ani\")": "$session.params.contextDataPlatform.ENT_FromAddress",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"botAction\")": "",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"callGUID\")": "$session.params.conversationId",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"function\")": "NatlNonClin",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"headIntent\")": "appointment",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")": null,
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"silentTransfer\")": "false",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"subFunction\")": "AgentGeneral",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"subFunctionDetail\")": "",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"subIntent\")": "appointmentGeneral",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"tfn\")": "$session.params.contextDataPlatform.ENT_ToAddress",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")": null,
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReasonCode\")": "X",
+        "contextMethod": "PATCH"
+      },
+      "SystemFunctionResults": {
+        "$sys.func.IF": ["false", null, null, "$session.params.ICMQuestionType"],
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"headIntent\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"subIntent\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"botAction\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"function\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"subFunction\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"subFunctionDetail\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReasonCode\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"silentTransfer\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"callGUID\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\", \"steering\", \"userUtterance\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"tfn\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"ani\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\", \"steering\", \"callerType\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\", \"steering\", \"ICMQuestionType\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 9": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Intent NLU Config",
+        "FlowId": "e95b268b-2b1b-43cc-9c29-82796349eff3",
+        "PageState": {
+          "Name": "Set Context",
+          "PageId": "8364a500-4815-4d70-9b2d-c08f95bcb1fa",
+          "Status": "TRANSITION_ROUTING",
+          "FormFilled": true
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "8b09fc88-eb59-467a-843b-99405734bd46",
+      "TriggeredCondition": "true",
+      "TargetFlow": "ee239613-433b-4a56-9559-2ea4196bd075"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 10": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "1f2d17f0-a617-457d-9a42-79746f069ef6",
+      "TriggeredCondition": "$session.params.contextMethod \u003d \"PATCH\"",
+      "TargetPage": "767098f6-9d3c-4ac7-95ec-1e32693d9a13"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 11": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Get Context with PATCH",
+          "PageId": "767098f6-9d3c-4ac7-95ec-1e32693d9a13",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "$request.webhook_status_code": 400.0,
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_PatchUpdate\")"
+      },
+      "Webhook": {
+        "Status": {
+          "ErrorCode": "INVALID_ARGUMENT",
+          "ErrorMessage": "Error calling webhook \u0027https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress\u0027: State: URL_ERROR, Reason: ERROR_OTHER, HTTP status code: 400"
+        },
+        "ID": "fa9e4294-d48c-4eb7-af3d-541a38101824",
+        "DisplayName": "Patch And Get Context",
+        "Tag": "patchAndGetContext",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress",
+        "Latency": "113 ms"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_PatchUpdate\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 12": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Get Context with PATCH",
+          "PageId": "767098f6-9d3c-4ac7-95ec-1e32693d9a13",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      },
+      "TriggeredEvent": "webhook.error",
+      "TriggeredEventHandlerId": "018ff298-e6d7-4ba5-9a54-dde42ad26cba"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 13": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Retry Get Context with PATCH",
+          "PageId": "17141b53-9fee-4342-bdfe-ca7561416fec",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "Webhook": {
+        "Status": {
+          "ErrorCode": "INVALID_ARGUMENT",
+          "ErrorMessage": "Error calling webhook \u0027https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress\u0027: State: URL_ERROR, Reason: ERROR_OTHER, HTTP status code: 400"
+        },
+        "ID": "fa9e4294-d48c-4eb7-af3d-541a38101824",
+        "DisplayName": "Patch And Get Context",
+        "Tag": "patchAndGetContext",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress",
+        "Latency": "176 ms"
+      }
+    }
+  }
+}, {
+  "Step 14": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Retry Get Context with PATCH",
+          "PageId": "17141b53-9fee-4342-bdfe-ca7561416fec",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      },
+      "TriggeredEvent": "webhook.error",
+      "TriggeredEventHandlerId": "6b3cd02d-798b-4257-abdf-076104783381"
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "events": "$sys.func.APPEND($sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027appointment\u0027, \u0027subIntent\u0027: \u0027appointmentGeneral\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\"))",
+        "globalVal": "techdiff",
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$session.params.peg\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: com.google.gson.stream.MalformedJsonException: Unterminated object at line 1 column 191 path $.data.errorType\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json"
+        }]
+      }
+    }
+  }
+}, {
+  "Step 15": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "64eecebf-d7de-4017-8b5b-3a0f0f5993d5",
+      "TriggeredCondition": "$session.params.globalVal \u003d \"techdiff\""
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")": "4",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"setEvent\")": "transfer",
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")": "4",
+        "IVRTransferReason": "4",
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot, \"_GB_globalTechDiff\")",
+        "transferReason": "4"
+      },
+      "Responses": [{
+        "payload": {
+          "activityParams": {
+            "bargeIn": false,
+            "enableSpeechInput": false
+          }
+        },
+        "responseType": "HANDLER_PROMPT",
+        "source": "VIRTUAL_AGENT"
+      }, {
+        "text": {
+          "text": ["Sorry, we\u0027re experiencing some trouble. Let’s connect you to someone who can help."]
+        },
+        "responseType": "HANDLER_PROMPT",
+        "source": "VIRTUAL_AGENT"
+      }],
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot, \"_GB_globalTechDiff\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"setEvent\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 16": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "37d8831a-e8fc-43cc-b034-0019ec986b86",
+      "TriggeredCondition": "true",
+      "TargetPage": "77f96580-d9a8-4e54-b2b7-710ce5e6a161"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 17": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Update Context",
+          "PageId": "77f96580-d9a8-4e54-b2b7-710ce5e6a161",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"globalHandler\")": "endCall",
+        "events": "$sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027appointment\u0027, \u0027subIntent\u0027: \u0027appointmentGeneral\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\"))"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"globalHandler\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: Wrong type of argument for function \"$sys.func.FORMAT_DATE\", expected 2th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 18": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Update Context",
+          "PageId": "77f96580-d9a8-4e54-b2b7-710ce5e6a161",
+          "Status": "TRANSITION_ROUTING",
+          "FormFilled": true
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "afd349b6-c07b-4c36-8704-bbf1a2cdb08d",
+      "TriggeredCondition": "true",
+      "TargetFlow": "ee239613-433b-4a56-9559-2ea4196bd075"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 19": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "1f2d17f0-a617-457d-9a42-79746f069ef6",
+      "TriggeredCondition": "$session.params.contextMethod \u003d \"PATCH\"",
+      "TargetPage": "767098f6-9d3c-4ac7-95ec-1e32693d9a13"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 20": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Get Context with PATCH",
+          "PageId": "767098f6-9d3c-4ac7-95ec-1e32693d9a13",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_PatchUpdate\")"
+      },
+      "Webhook": {
+        "Status": {
+          "ErrorCode": "INVALID_ARGUMENT",
+          "ErrorMessage": "Error calling webhook \u0027https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress\u0027: State: URL_ERROR, Reason: ERROR_OTHER, HTTP status code: 400"
+        },
+        "ID": "fa9e4294-d48c-4eb7-af3d-541a38101824",
+        "DisplayName": "Patch And Get Context",
+        "Tag": "patchAndGetContext",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress",
+        "Latency": "110 ms"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_PatchUpdate\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 21": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Get Context with PATCH",
+          "PageId": "767098f6-9d3c-4ac7-95ec-1e32693d9a13",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      },
+      "TriggeredEvent": "webhook.error",
+      "TriggeredEventHandlerId": "018ff298-e6d7-4ba5-9a54-dde42ad26cba"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 22": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Retry Get Context with PATCH",
+          "PageId": "17141b53-9fee-4342-bdfe-ca7561416fec",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "Webhook": {
+        "Status": {
+          "ErrorCode": "INVALID_ARGUMENT",
+          "ErrorMessage": "Error calling webhook \u0027https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress\u0027: State: URL_ERROR, Reason: ERROR_OTHER, HTTP status code: 400"
+        },
+        "ID": "fa9e4294-d48c-4eb7-af3d-541a38101824",
+        "DisplayName": "Patch And Get Context",
+        "Tag": "patchAndGetContext",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress",
+        "Latency": "140 ms"
+      }
+    }
+  }
+}, {
+  "Step 23": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Retry Get Context with PATCH",
+          "PageId": "17141b53-9fee-4342-bdfe-ca7561416fec",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      },
+      "TriggeredEvent": "webhook.error",
+      "TriggeredEventHandlerId": "6b3cd02d-798b-4257-abdf-076104783381"
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "events": "$sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027appointment\u0027, \u0027subIntent\u0027: \u0027appointmentGeneral\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\"))",
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$session.params.peg\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: com.google.gson.stream.MalformedJsonException: Unterminated object at line 1 column 191 path $.data.errorType\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json"
+        }]
+      }
+    }
+  }
+}, {
+  "Step 24": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "64eecebf-d7de-4017-8b5b-3a0f0f5993d5",
+      "TriggeredCondition": "$session.params.globalVal \u003d \"techdiff\""
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot, \"_GB_globalTechDiff\")"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot, \"_GB_globalTechDiff\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"setEvent\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 25": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "37d8831a-e8fc-43cc-b034-0019ec986b86",
+      "TriggeredCondition": "true",
+      "TargetPage": "77f96580-d9a8-4e54-b2b7-710ce5e6a161"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 26": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Update Context",
+          "PageId": "77f96580-d9a8-4e54-b2b7-710ce5e6a161",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "events": "$sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027appointment\u0027, \u0027subIntent\u0027: \u0027appointmentGeneral\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\"))"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"globalHandler\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: Wrong type of argument for function \"$sys.func.FORMAT_DATE\", expected 2th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 27": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Update Context",
+          "PageId": "77f96580-d9a8-4e54-b2b7-710ce5e6a161",
+          "Status": "TRANSITION_ROUTING",
+          "FormFilled": true
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "afd349b6-c07b-4c36-8704-bbf1a2cdb08d",
+      "TriggeredCondition": "true",
+      "TargetFlow": "ee239613-433b-4a56-9559-2ea4196bd075"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 28": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "1f2d17f0-a617-457d-9a42-79746f069ef6",
+      "TriggeredCondition": "$session.params.contextMethod \u003d \"PATCH\"",
+      "TargetPage": "767098f6-9d3c-4ac7-95ec-1e32693d9a13"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 29": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Get Context with PATCH",
+          "PageId": "767098f6-9d3c-4ac7-95ec-1e32693d9a13",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_PatchUpdate\")"
+      },
+      "Webhook": {
+        "Status": {
+          "ErrorCode": "INVALID_ARGUMENT",
+          "ErrorMessage": "Error calling webhook \u0027https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress\u0027: State: URL_ERROR, Reason: ERROR_OTHER, HTTP status code: 400"
+        },
+        "ID": "fa9e4294-d48c-4eb7-af3d-541a38101824",
+        "DisplayName": "Patch And Get Context",
+        "Tag": "patchAndGetContext",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress",
+        "Latency": "93 ms"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_PatchUpdate\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 30": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Get Context with PATCH",
+          "PageId": "767098f6-9d3c-4ac7-95ec-1e32693d9a13",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      },
+      "TriggeredEvent": "webhook.error",
+      "TriggeredEventHandlerId": "018ff298-e6d7-4ba5-9a54-dde42ad26cba"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 31": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Retry Get Context with PATCH",
+          "PageId": "17141b53-9fee-4342-bdfe-ca7561416fec",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "Webhook": {
+        "Status": {
+          "ErrorCode": "INVALID_ARGUMENT",
+          "ErrorMessage": "Error calling webhook \u0027https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress\u0027: State: URL_ERROR, Reason: ERROR_OTHER, HTTP status code: 400"
+        },
+        "ID": "fa9e4294-d48c-4eb7-af3d-541a38101824",
+        "DisplayName": "Patch And Get Context",
+        "Tag": "patchAndGetContext",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress",
+        "Latency": "135 ms"
+      }
+    }
+  }
+}, {
+  "Step 32": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Retry Get Context with PATCH",
+          "PageId": "17141b53-9fee-4342-bdfe-ca7561416fec",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      },
+      "TriggeredEvent": "webhook.error",
+      "TriggeredEventHandlerId": "6b3cd02d-798b-4257-abdf-076104783381"
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "events": "$sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027appointment\u0027, \u0027subIntent\u0027: \u0027appointmentGeneral\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\"))",
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$session.params.peg\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: com.google.gson.stream.MalformedJsonException: Unterminated object at line 1 column 191 path $.data.errorType\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json"
+        }]
+      }
+    }
+  }
+}, {
+  "Step 33": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "64eecebf-d7de-4017-8b5b-3a0f0f5993d5",
+      "TriggeredCondition": "$session.params.globalVal \u003d \"techdiff\""
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot, \"_GB_globalTechDiff\")"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot, \"_GB_globalTechDiff\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"setEvent\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 34": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "37d8831a-e8fc-43cc-b034-0019ec986b86",
+      "TriggeredCondition": "true",
+      "TargetPage": "77f96580-d9a8-4e54-b2b7-710ce5e6a161"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 35": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Update Context",
+          "PageId": "77f96580-d9a8-4e54-b2b7-710ce5e6a161",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "events": "$sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027appointment\u0027, \u0027subIntent\u0027: \u0027appointmentGeneral\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\"))"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"globalHandler\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: Wrong type of argument for function \"$sys.func.FORMAT_DATE\", expected 2th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 36": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Update Context",
+          "PageId": "77f96580-d9a8-4e54-b2b7-710ce5e6a161",
+          "Status": "TRANSITION_ROUTING",
+          "FormFilled": true
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "afd349b6-c07b-4c36-8704-bbf1a2cdb08d",
+      "TriggeredCondition": "true",
+      "TargetFlow": "ee239613-433b-4a56-9559-2ea4196bd075"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 37": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "1f2d17f0-a617-457d-9a42-79746f069ef6",
+      "TriggeredCondition": "$session.params.contextMethod \u003d \"PATCH\"",
+      "TargetPage": "767098f6-9d3c-4ac7-95ec-1e32693d9a13"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 38": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Get Context with PATCH",
+          "PageId": "767098f6-9d3c-4ac7-95ec-1e32693d9a13",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_PatchUpdate\")"
+      },
+      "Webhook": {
+        "Status": {
+          "ErrorCode": "INVALID_ARGUMENT",
+          "ErrorMessage": "Error calling webhook \u0027https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress\u0027: State: URL_ERROR, Reason: ERROR_OTHER, HTTP status code: 400"
+        },
+        "ID": "fa9e4294-d48c-4eb7-af3d-541a38101824",
+        "DisplayName": "Patch And Get Context",
+        "Tag": "patchAndGetContext",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress",
+        "Latency": "90 ms"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_PatchUpdate\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 39": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Get Context with PATCH",
+          "PageId": "767098f6-9d3c-4ac7-95ec-1e32693d9a13",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      },
+      "TriggeredEvent": "webhook.error",
+      "TriggeredEventHandlerId": "018ff298-e6d7-4ba5-9a54-dde42ad26cba"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 40": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Retry Get Context with PATCH",
+          "PageId": "17141b53-9fee-4342-bdfe-ca7561416fec",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "Webhook": {
+        "Status": {
+          "ErrorCode": "INVALID_ARGUMENT",
+          "ErrorMessage": "Error calling webhook \u0027https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress\u0027: State: URL_ERROR, Reason: ERROR_OTHER, HTTP status code: 400"
+        },
+        "ID": "fa9e4294-d48c-4eb7-af3d-541a38101824",
+        "DisplayName": "Patch And Get Context",
+        "Tag": "patchAndGetContext",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress",
+        "Latency": "100 ms"
+      }
+    }
+  }
+}, {
+  "Step 41": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Retry Get Context with PATCH",
+          "PageId": "17141b53-9fee-4342-bdfe-ca7561416fec",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      },
+      "TriggeredEvent": "webhook.error",
+      "TriggeredEventHandlerId": "6b3cd02d-798b-4257-abdf-076104783381"
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "events": "$sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027appointment\u0027, \u0027subIntent\u0027: \u0027appointmentGeneral\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\"))",
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$session.params.peg\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: com.google.gson.stream.MalformedJsonException: Unterminated object at line 1 column 191 path $.data.errorType\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json"
+        }]
+      }
+    }
+  }
+}, {
+  "Step 42": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "64eecebf-d7de-4017-8b5b-3a0f0f5993d5",
+      "TriggeredCondition": "$session.params.globalVal \u003d \"techdiff\""
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot, \"_GB_globalTechDiff\")"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot, \"_GB_globalTechDiff\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"setEvent\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 43": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "37d8831a-e8fc-43cc-b034-0019ec986b86",
+      "TriggeredCondition": "true",
+      "TargetPage": "77f96580-d9a8-4e54-b2b7-710ce5e6a161"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 44": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Update Context",
+          "PageId": "77f96580-d9a8-4e54-b2b7-710ce5e6a161",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "events": "$sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027appointment\u0027, \u0027subIntent\u0027: \u0027appointmentGeneral\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\"))"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"globalHandler\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: Wrong type of argument for function \"$sys.func.FORMAT_DATE\", expected 2th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 45": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Update Context",
+          "PageId": "77f96580-d9a8-4e54-b2b7-710ce5e6a161",
+          "Status": "TRANSITION_ROUTING",
+          "FormFilled": true
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "afd349b6-c07b-4c36-8704-bbf1a2cdb08d",
+      "TriggeredCondition": "true",
+      "TargetFlow": "ee239613-433b-4a56-9559-2ea4196bd075"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 46": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "1f2d17f0-a617-457d-9a42-79746f069ef6",
+      "TriggeredCondition": "$session.params.contextMethod \u003d \"PATCH\"",
+      "TargetPage": "767098f6-9d3c-4ac7-95ec-1e32693d9a13"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 47": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Get Context with PATCH",
+          "PageId": "767098f6-9d3c-4ac7-95ec-1e32693d9a13",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_PatchUpdate\")"
+      },
+      "Webhook": {
+        "Status": {
+          "ErrorCode": "INVALID_ARGUMENT",
+          "ErrorMessage": "Error calling webhook \u0027https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress\u0027: State: URL_ERROR, Reason: ERROR_OTHER, HTTP status code: 400"
+        },
+        "ID": "fa9e4294-d48c-4eb7-af3d-541a38101824",
+        "DisplayName": "Patch And Get Context",
+        "Tag": "patchAndGetContext",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress",
+        "Latency": "81 ms"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_intentDetection_PatchUpdate\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 48": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Get Context with PATCH",
+          "PageId": "767098f6-9d3c-4ac7-95ec-1e32693d9a13",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      },
+      "TriggeredEvent": "webhook.error",
+      "TriggeredEventHandlerId": "018ff298-e6d7-4ba5-9a54-dde42ad26cba"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 49": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Retry Get Context with PATCH",
+          "PageId": "17141b53-9fee-4342-bdfe-ca7561416fec",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "Webhook": {
+        "Status": {
+          "ErrorCode": "INVALID_ARGUMENT",
+          "ErrorMessage": "Error calling webhook \u0027https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress\u0027: State: URL_ERROR, Reason: ERROR_OTHER, HTTP status code: 400"
+        },
+        "ID": "fa9e4294-d48c-4eb7-af3d-541a38101824",
+        "DisplayName": "Patch And Get Context",
+        "Tag": "patchAndGetContext",
+        "URL": "https://api-stg.uhg.com/api/cloud/applications/contact-center-conversational-platform/v1/conversations/$session.params.conversationId/context?get-context-after-patch\u003dtrue\u0026disable-automatic-start-state-evaluation\u003dtrue\u0026configuration-experience\u003d$session.params.contextDataBots.steering.configurationExperience\u0026configuration-experience-profile\u003d$session.params.tfn\u0026configuration-experience-profile\u003d$session.params.contextDataPlatform.ENT_ToAddress",
+        "Latency": "88 ms"
+      }
+    }
+  }
+}, {
+  "Step 50": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "State Handler",
+        "FlowId": "ee239613-433b-4a56-9559-2ea4196bd075",
+        "PageState": {
+          "Name": "Retry Get Context with PATCH",
+          "PageId": "17141b53-9fee-4342-bdfe-ca7561416fec",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      },
+      "TriggeredEvent": "webhook.error",
+      "TriggeredEventHandlerId": "6b3cd02d-798b-4257-abdf-076104783381"
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "events": "$sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027intent-detection-complete\u0027, location:\u0027$session.params.peg\u0027, \u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027genAIModel\u0027: \u0027gemini-2.5-flash\u0027, \u0027intent\u0027: \u0027appointment\u0027, \u0027subIntent\u0027: \u0027appointmentGeneral\u0027, \u0027status\u0027:\u0027SUCCESS\u0027,\u0027noInput\u0027:\u0027$session.params.noinput_num\u0027, \u0027noMatch\u0027:\u0027$session.params.nomatch_num\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027agent-transfer-start\u0027,\u0027location\u0027:\u0027bh_steering_GB_UserRequestedAgent\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027transferDN\u0027: \u0027$session.params.contextDataState.current.data.transferDN\u0027, \u0027transferReasonCode\u0027:\u00273\u0027}}\")), $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\"))",
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot,\"_callflowOrch_getSteeringBot_ERROR\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.APPEND($session.params.events, $sys.func.TO_OBJECT(\"{\u0027id\u0027:\u0027error\u0027,\u0027location\u0027:\u0027$session.params.peg\u0027,\u0027timestamp\u0027:\u0027$sys.func.FORMAT_DATE($sys.func.NOW(), $session.params.timestampFormat)\u0027, \u0027data\u0027: {\u0027errorType\u0027: \u0027Patch and Get Context URL Error\u0027\u0027}}\"))",
+          "Message": "$sys.func.TO_OBJECT: Can\u0027t parse JSON argument: com.google.gson.stream.MalformedJsonException: Unterminated object at line 1 column 191 path $.data.errorType\nSee https://github.com/google/gson/blob/main/Troubleshooting.md#malformed-json"
+        }]
+      }
+    }
+  }
+}, {
+  "Step 51": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "64eecebf-d7de-4017-8b5b-3a0f0f5993d5",
+      "TriggeredCondition": "$session.params.globalVal \u003d \"techdiff\""
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+        "peg": "$sys.func.CONCATENATE($session.params.steering_bot, \"_GB_globalTechDiff\")"
+      },
+      "SystemFunctionResults": {
+        "SystemFunctionErrors": [{
+          "Expression": "$sys.func.CONCATENATE($session.params.steering_bot, \"_GB_globalTechDiff\")",
+          "Message": "Wrong type of argument for function \"$sys.func.CONCATENATE\", expected 1th argument to be one of type: [string]."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"setEvent\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"transferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }, {
+          "Expression": "$sys.func.NESTED_FIELD(\"$session.params.contextDataBots\",\"steering\",\"IVRTransferReason\")",
+          "Message": "Parameter $session.params.contextDataBots is not an object."
+        }]
+      }
+    }
+  }
+}, {
+  "Step 52": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Start Page",
+          "PageId": "START_PAGE",
+          "Status": "TRANSITION_ROUTING"
+        },
+        "Version": 0.0
+      },
+      "TriggeredTransitionRouteId": "37d8831a-e8fc-43cc-b034-0019ec986b86",
+      "TriggeredCondition": "true",
+      "TargetPage": "77f96580-d9a8-4e54-b2b7-710ce5e6a161"
+    },
+    "FunctionExecution": {
+    }
+  }
+}, {
+  "Step 53": {
+    "Type": "STATE_MACHINE",
+    "StateMachine": {
+      "FlowState": {
+        "Name": "Global Behavior",
+        "FlowId": "cfaca466-93a5-4153-9928-aa29794acca1",
+        "PageState": {
+          "Name": "Update Context",
+          "PageId": "77f96580-d9a8-4e54-b2b7-710ce5e6a161",
+          "Status": "ENTERING_PAGE"
+        },
+        "Version": 0.0
+      }
+    },
+    "FunctionExecution": {
+      "SessionParameters(Updated)": {
+	... Truncated
+Use Control + F6 to jump to and from this notification
